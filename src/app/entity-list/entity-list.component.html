@@ -1,0 +1,10 @@
+<div class="list">
+  <div class="title">{{title}}</div>
+  <div class="list-item" *ngFor="let entity of entities" >
+    <span (click)="selected(entity.uuid)">
+	  	<img class="icon-small" src="/assets/{{entity.type}}.svg"/>
+	  	{{entity.display}}
+  	</span>
+  	<span class="delete" (click)="delete(entity.uuid)">X</span>
+  </div>
+</div>
