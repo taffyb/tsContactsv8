@@ -1,4 +1,4 @@
-import { Injectable }       from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { DropdownField } from './classes/field-dropdown';
 import { FieldBase }     from './classes/field-base';
@@ -7,16 +7,17 @@ import { CheckboxField }  from './classes/field-checkbox';
 import { TextareaField }  from './classes/field-textarea';
 import { HLineField }  from './classes/field-hr';
 
-import {ENTITY_DEFS} from './data/EntityDefs';
-
 import {IEntityDef} from './classes/IEntityDef';
 import {IEntity} from './classes/IEntity';
 import {IProperty} from './classes/IProperty';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class FieldService {
 
-
+  constructor() { }
+  
   getEntityDefFields(entityDef:IEntityDef):FieldBase<any>[] {
     let fields: FieldBase<any>[] = [];  
     let defProps={};
@@ -141,57 +142,4 @@ export class FieldService {
     
       return rtn;
   }
-    
-    
-//  getProperties() {
-//
-//    let fields: FieldBase<any>[] = [
-//
-//      new DropdownField({
-//        key: 'brave',
-//        label: 'Bravery Rating',
-//        options: [
-//          {key: 'solid',  value: 'Solid'},
-//          {key: 'great',  value: 'Great'},
-//          {key: 'good',   value: 'Good'},
-//          {key: 'unproven', value: 'Unproven'}
-//        ],
-//        order: 3
-//      }),
-//
-//      new TextboxField({
-//        key: 'firstName',
-//        label: 'First name',
-//        value: 'Bombasto',
-//        required: true,
-//        order: 1
-//      }),
-//
-//      new TextboxField({
-//        key: 'emailAddress',
-//        label: 'DOB',
-//        type: 'date',
-//        order: 2
-//      }),
-//
-//      new TextareaField({
-//        key: 'notes',
-//        label: 'Notes',
-//        type: 'textarea',
-//        order: 5
-//      }),
-//
-//      new CheckboxField({
-//        key: 'isContractor',
-//        label: 'Is A Contractor',
-//        order: 6
-//      }),
-//
-//      new HLineField({
-//        order: 4
-//      })
-//    ];
-//
-//    return fields.sort((a, b) => a.order - b.order);
-//  }
 }

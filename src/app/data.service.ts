@@ -38,7 +38,7 @@ export class DataService {
         };
       }
     
-    private getEntities(): Observable<any> {
+    private getEntities(): Observable<IEntity[]> {
         return this.http.get<any>(this.endpoint + 'entities').pipe(
             tap((entity) => console.log(`data.service.getEntities()`)),
             catchError(this.handleError<any>('getEntities'))
@@ -53,4 +53,100 @@ export class DataService {
             resolve(this.entityList);
         });
     }
+
+    getEntity(uuid): Observable<IEntity> {
+        return this.http.get<IEntity>(this.endpoint + 'entities/' + uuid);
+    }
+    
+    addEntity (entity:IEntity): Observable<any> {
+        return  this.http
+            .post(this.endpoint + 'entities', JSON.stringify(entity), this.httpOptions).pipe(
+                tap((product) => console.log(`added entity  id=${entity.uuid}`)),
+                catchError(this.handleError<any>('addEntity'))
+              );
+      }
+    updateEntity (entity:IEntity): Observable<any> {
+
+        return this.http
+            .put(this.endpoint + 'entities/' + entity.uuid, JSON.stringify(entity), this.httpOptions).pipe(
+                tap((product) => console.log(`updated entity  id=${entity.uuid}`)),
+                catchError(this.handleError<any>('updateEntity'))
+              );
+      }
+    deleteEntity (euuid): Observable<any> {
+        this.entityList=null;
+        return this.http
+            .delete<any>(this.endpoint + 'entities/' + euuid, this.httpOptions).pipe(
+              tap(_ => console.log(`deleted entity.uuid=${euuid}`)),
+              catchError(this.handleError<any>('deleteEntity'))
+            );        
+      }
+    private getEDefs(): Observable<IEntityDef[]> {
+        return this.http.get<any>(this.endpoint + 'entity-defs').pipe(
+                tap((product) => console.log(`data.service.getEDefs()`)),
+                catchError(this.handleError<any>('getEDefs'))
+              );
+    }
+    
+    getEntityDefs():Promise<IEntityDef[]>{
+        return new Promise<IEntityDef[]>(async (resolve,reject)=>{
+            if(!this.entityDefList){
+                this.entityDefList = await this.getEDefs().toPromise();
+//                console.log(`entityDefs: ${JSON.stringify(this.entityDefs)}`);
+            }
+            resolve(this.entityDefList);
+        });
+    }
+
+
+    getEntityDefList(forceRefresh:boolean=false):Promise<IEntityDef[]>{
+        return new Promise<IEntityDef[]>(async (resolve,reject)=>{
+            if((!this.entityDefList || this.entityDefList===null) || forceRefresh){
+                this.entityDefList = await this.getEDefs().toPromise();
+            }
+            resolve(this.entityDefList);
+        });
+    }   
+    
+    getEntityDefGroups(type:string):Promise<string[]>{
+        return new Promise<string[]>(async (resolve,reject)=>{
+            let groupNames:string[]=[];
+    
+            if(!this.entityDefList){
+                this.entityDefList = await this.getEDefs().toPromise();
+            }
+            let entityDef:IEntityDef;
+            for(let i=0;i<this.entityDefList.length;i++){
+                if(this.entityDefList[i].name==type){
+                    entityDef=this.entityDefList[i];
+                }
+            }
+            let groups:IPropertyGroup[]=entityDef.groups;
+            groups.sort((a, b) => a.order - b.order);
+            groups.forEach((g)=>{
+                groupNames.push(g.name);
+            });
+//            console.log(`entityDefs.groups: ${JSON.stringify(groupNames)}`);
+            resolve(groupNames);
+        });
+    }
+    getEntityDef(type:string):Promise<IEntityDef>{
+        return new Promise<IEntityDef>(async (resolve,reject)=>{
+            if(!this.entityDefList){
+                this.entityDefList = await this.getEDefs().toPromise();
+            }
+            let entityDef:IEntityDef;
+            for(let i=0;i<this.entityDefList.length;i++){
+                if(this.entityDefList[i].name==type){
+                    entityDef=this.entityDefList[i];
+                }
+            }
+            if(entityDef){
+                resolve(entityDef);
+            }else{
+                reject();
+            }
+        });
+    }
+    
 }
