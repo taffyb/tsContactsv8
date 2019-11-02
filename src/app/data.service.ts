@@ -83,20 +83,20 @@ export class DataService {
       }
     private getEDefs(): Observable<IEntityDef[]> {
         return this.http.get<any>(this.endpoint + 'entity-defs').pipe(
-                tap((product) => console.log(`data.service.getEDefs()`)),
+                tap((entityDef) => console.log(`data.service.getEDefs()`)),
                 catchError(this.handleError<any>('getEDefs'))
               );
     }
     
-    getEntityDefs():Promise<IEntityDef[]>{
-        return new Promise<IEntityDef[]>(async (resolve,reject)=>{
-            if(!this.entityDefList){
-                this.entityDefList = await this.getEDefs().toPromise();
-//                console.log(`entityDefs: ${JSON.stringify(this.entityDefs)}`);
-            }
-            resolve(this.entityDefList);
-        });
-    }
+//    getEntityDefs():Promise<IEntityDef[]>{
+//        return new Promise<IEntityDef[]>(async (resolve,reject)=>{
+//            if(!this.entityDefList){
+//                this.entityDefList = await this.getEDefs().toPromise();
+////                console.log(`entityDefs: ${JSON.stringify(this.entityDefList)}`);
+//            }
+//            resolve(this.entityDefList);
+//        });
+//    }
 
 
     getEntityDefList(forceRefresh:boolean=false):Promise<IEntityDef[]>{

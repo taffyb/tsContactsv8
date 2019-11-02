@@ -1,5 +1,15 @@
 
+    <div>
+      <entity-form *ngIf="isEntityFormVisible" [euuid]="euuid" [entityType]="entityType" (onClose)="hideEntityForm($event)"></entity-form>
+      <entity-def-form *ngIf="isEntityDefFormVisible" [entityDefType]="entityDefType" (onClose)="hideEntityDefForm($event)"></entity-def-form>
+      Entity Type: 
+      <select id="entityType" (change)="setEntityType($event.target.value)">
+          <option *ngFor="let def of entityDefs" [value]="def.name">{{def.name}}</option>
+      </select>
+      <button  (click)="euuid='';showEntityForm()">New Entity</button>
+      <button  (click)="showEntityDefForm()">Edit</button>
       <div>
 	      <entity-list [entities]="entities" (onSelect)="euuid=$event;showEntityForm()" (onDelete)="deleteEntity($event)"></entity-list>
-	      <!-- <entity-def-list [entityDefs]="entityDefs" (onSelect)="showEntityDefForm($event)" (onDelete)="deleteEntityDef($event)"></entity-def-list> -->
+	      <entity-def-list [entityDefs]="entityDefs" (onSelect)="showEntityDefForm($event)" (onDelete)="deleteEntityDef($event)"></entity-def-list>
       </div>
+    </div>
