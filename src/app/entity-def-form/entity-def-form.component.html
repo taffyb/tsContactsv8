@@ -12,7 +12,7 @@
   Type: <input type="text" [value]="entityDefType"><br>
   Display: <input type="text" [value]="display">
   <p>
-  <!-- 
+   
   <form class="form-vertical" (ngSubmit)="onSubmit()" [formGroup]="form">
     <div class="tabbar">
 		<div *ngFor="let tab of fieldGroups" 
@@ -29,7 +29,7 @@
 					     'active':activeTab==group
 					   }" [style.height]="formHeight">
 	    <div *ngFor="let field of getFilteredFields(group)" class="form-row">
-	      <div class="property" >{{field.key}}<span (click)="showProperties(field.key)">[Edit]</span></div><br>
+	      <div class="property" >{{field.key}}<button mat-raised-button (click)="showProperties(field.key)">...</button></div><br>
 	      
 	    </div>
 	</div>
@@ -40,5 +40,5 @@
     </div>
     
   </form>
-   -->
+   
 </div>

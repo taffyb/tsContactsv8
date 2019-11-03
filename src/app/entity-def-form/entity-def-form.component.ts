@@ -20,8 +20,9 @@ export class EntityDefFormComponent implements OnInit {
   propertyFormVisible:boolean=false;
   properties:IProperty[]=[new BaseProperty()];
   @Output()onClose:EventEmitter<boolean> = new EventEmitter<boolean>();
-
   @Input()entityDefType:string;
+  
+  
   display:string;
   fields: FieldBase<any>[] = [];
   fieldGroups:string[];
@@ -37,16 +38,19 @@ export class EntityDefFormComponent implements OnInit {
   constructor(private fcs: FieldControlService,private fs: FieldService,private ds: DataService) { }
 
   ngOnInit() {
-      this.properties[0].name = "Notes"
+     // this.properties[0].name = "Notes"
       this.loadEntityDef();
   }
 
   async loadEntityDef(){
       this.title = this.entityDefType;
       this.entityDef= await this.ds.getEntityDef(this.entityDefType);
+//      console.log(`entity-def-form.loadEntityDef(${this.entityDefType})\n${JSON.stringify(this.entityDef)}`);
       this.fieldGroups= await this.ds.getEntityDefGroups(this.entityDefType);
-      this.display=this.entityDef.display;
-      this.fields = this.fs.getEntityDefFields(this.entityDef);
+//      console.log(`entity-def-form.loadEntityDef(${this.entityDefType}).fieldGroups\n${JSON.stringify(this.fieldGroups)}`);
+      this.display=this.entityDef.display;1
+      this.fields = await this.fs.getEntityDefFields(this.entityDef);
+//      console.log(`entity-def-form.loadEntityDef(${this.entityDefType}).fields\n${JSON.stringify(this.fields)}`);
       this.form =this.fcs.toFormGroup(this.fields);
       this.activeTab=this.fieldGroups[0];
       this.form.valueChanges.subscribe(form => {
