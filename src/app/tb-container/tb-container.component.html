@@ -1,0 +1,8 @@
+<div class="container-outer" [ngClass]="{'container-outer-right':align=='right',
+										'container-outer-left':align=='left'}">
+	<div class="handle" (mousedown)="onMouseDown()" (mouseup)="onMouseUp()" (mousemove)="onMouseMove($event)">&nbsp;</div>
+	<div class="container-inner" [ngClass]="{'container-inner-right':align=='right',
+										'container-inner-left':align=='left'}">
+		<ng-content></ng-content>
+	</div>
+</div>

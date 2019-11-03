@@ -1,0 +1,39 @@
+
+.container-outer{
+	position:relative;
+	padding-top:10px;
+	
+	width:20%;
+	height:100%;
+}
+.container-outer-right{
+	padding-right:20px;
+	float:right;
+	padding-left:0;
+}
+.container-outer-left{
+	padding-left:5px;
+	padding-right:0;
+	float:left;
+}
+.container-inner-left{
+	margin-right:3px;
+	border-right:1px solid gray;
+}
+.container-inner-right{
+	margin-left:3px;
+	border-left:1px solid gray;
+}
+.container-outer .handle{
+	position:relative;
+	width:3px;
+	height:100%;
+	border: 1px solid black;
+	cursor:e-resize;
+}
+.container-outer-left .handle{
+	float:right;
+}
+.container-outer-right .handle{
+	float:left;
+}

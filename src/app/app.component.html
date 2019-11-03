@@ -9,7 +9,23 @@
       <button  (click)="euuid='';showEntityForm()">New Entity</button>
       <button  (click)="showEntityDefForm()">Edit</button>
       <div>
-	      <entity-list [entities]="entities" (onSelect)="euuid=$event;showEntityForm()" (onDelete)="deleteEntity($event)"></entity-list>
-	      <entity-def-list [entityDefs]="entityDefs" (onSelect)="showEntityDefForm($event)" (onDelete)="deleteEntityDef($event)"></entity-def-list>
+      	  <tb-container >
+	      	<entity-list [entities]="entities" (onSelect)="euuid=$event;showEntityForm()" (onDelete)="deleteEntity($event)"></entity-list>
+	      </tb-container>
+	      
+      	  <tb-container [align]="'right'">
+	      	<entity-def-list [entityDefs]="entityDefs" (onSelect)="showEntityDefForm($event)" (onDelete)="deleteEntityDef($event)"></entity-def-list>
+	      </tb-container>
       </div>
     </div>
+<!-- 
+<mat-form-field>
+  <input matInput [(ngModel)]="sendValue" placeholder="Enter value for Dialog">
+</mat-form-field>
+<div *ngIf="dialogValue">
+  <b>Value From Dialog</b>: {{dialogValue}}
+</div>
+<div>
+  <button mat-raised-button (click)="openDialog()">Open Dialog</button>
+</div>
+ -->

@@ -4,6 +4,7 @@
   	<img class="icon-small" src="/assets/{{entityType}}.svg"/>
   	{{title}}
   	<span class="close" (click)="onCancel()">X</span></h2>
+  
   <form class="form-vertical" (ngSubmit)="onSubmit()" [formGroup]="form">
     <div class="tabbar">
 		<div *ngFor="let tab of fieldGroups" 
@@ -30,4 +31,5 @@
       <button type="button" (click)="onCancel()">Cancel</button> &nbsp;
     </div>
   </form>
+
 </div>

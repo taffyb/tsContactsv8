@@ -5,6 +5,9 @@ import { DataService } from './data.service';
 import {IEntityDef} from './classes/IEntityDef';
 import {IEntity} from './classes/IEntity';
 
+import { MatDialog } from '@angular/material';
+import { ModalDialog, DialogOptions } from './modal-dialog/modal-dialog';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -19,9 +22,12 @@ export class AppComponent implements OnInit {
     entityDefType:string="Person";
     entities:IEntity[]=[];
     entityDefs:IEntityDef[];
+
+    dialogValue:string; 
+    sendValue:string;
     
     constructor(private fs: FieldService,private  ds:DataService,
-            public zone: NgZone) {
+            public zone: NgZone,public dialog: MatDialog) {
         ds.getEntityDefList()
             .then(data => {
                 this.entityDefs = data;
@@ -75,4 +81,19 @@ export class AppComponent implements OnInit {
     setEntityType(et){
         this.entityType=et;
     }
+    openDialog(): void {
+        const dialogRef = this.dialog.open(ModalDialog, {
+          width: '300px',
+          backdropClass:'custom-dialog-backdrop-class',
+          panelClass:'custom-dialog-panel-class',
+          data: {message: "You have unsaved changes are you sure you want to exit?",
+                 dialogOptions:DialogOptions.OK+DialogOptions.CANCEL+DialogOptions.WARNING
+                }
+        });
+     
+        dialogRef.afterClosed().subscribe(result => {
+          console.log('The dialog was closed',result);
+          this.dialogValue = result.data;
+        });
+      }
 }
