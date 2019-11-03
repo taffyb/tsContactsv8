@@ -1,0 +1,23 @@
+
+  <h2 class="title"><img class="icon-small" src="/assets/{{data.entity.type}}.svg"/>{{data.entity.type}}</h2>
+  <form class="form-vertical"  [formGroup]="form">
+    <div class="tabbar">
+		<div *ngFor="let tab of data.fieldGroups" 
+			class="tab" [ngClass]="{'active':activeTab==tab}"
+			(click)="activeTab=tab">{{tab}}
+		</div>
+	</div>
+	
+    <div *ngFor="let group of data.fieldGroups" 
+			class="group" [ngClass]="{ 'active':activeTab==group }" [style.height]="formHeight">
+	    <div *ngFor="let field of getFilteredFields(group)" class="form-row">
+	      <app-field [field]="field" [form]="form"></app-field>
+	    </div>
+	</div>
+	<p>
+    <div class="form-row">
+      <button mat-raised-button (click)="onSave()" [disabled]="!form.valid || !formChanged">Save</button> &nbsp;
+      <button mat-raised-button (click)="closeDialog()">Cancel</button>
+    </div>
+  </form>
+

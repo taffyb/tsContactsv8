@@ -12,10 +12,11 @@ import { EntityListComponent } from './entity-list/entity-list.component';
 import { EntityDefListComponent } from './entity-def-list/entity-def-list.component';
 import { DynamicFormFieldComponent } from './dynamic-form-field/dynamic-form-field.component';
 import { EntityDefFormComponent } from './entity-def-form/entity-def-form.component';
-import { EntityFormComponent } from './entity-form/entity-form.component';
 import { PropertyFormComponent } from './property-form/property-form.component';
 import { TbContainerComponent } from './tb-container/tb-container.component';
 import { ModalDialog } from './modal-dialog/modal-dialog';
+import { EntityDialogComponent } from './entity-dialog/entity-dialog.component';
+import { EntityDefDialogComponent } from './entity-def-dialog/entity-def-dialog.component';
 
 @NgModule({
   declarations: [
@@ -24,10 +25,11 @@ import { ModalDialog } from './modal-dialog/modal-dialog';
     EntityDefListComponent,
     DynamicFormFieldComponent,
     EntityDefFormComponent,
-    EntityFormComponent,
     PropertyFormComponent,
     TbContainerComponent,
-    ModalDialog
+    ModalDialog,
+    EntityDialogComponent,
+    EntityDefDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -40,6 +42,6 @@ import { ModalDialog } from './modal-dialog/modal-dialog';
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [ ModalDialog, ]
+  entryComponents: [ ModalDialog, EntityDialogComponent, EntityDefDialogComponent]
 })
 export class AppModule { }

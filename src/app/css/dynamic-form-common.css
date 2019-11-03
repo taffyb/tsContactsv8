@@ -1,7 +1,4 @@
-html, body{
-	height:100%;
-	margin:0;
-}
+
 .title{
 	background:gray;
 	color:white;
@@ -37,16 +34,6 @@ html, body{
 .tab.active {
   background-color: #ccc;
 }
-/*
-.icon-small{
-	width:20px;
-	height:20px;
-	padding-left:5px;
-	
-	padding-right:5px;
-}
-*/
-
 .background{
 	background:grey;
   	opacity: 0.5;
@@ -64,7 +51,7 @@ html, body{
 }
 .group.active{
 	display:block;
-	overflow-y:scroll;
+	overflow-y:auto;
 	overflow-x:auto;
 }
 .form{
