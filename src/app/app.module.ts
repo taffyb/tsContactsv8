@@ -11,7 +11,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EntityListComponent } from './entity-list/entity-list.component';
 import { EntityDefListComponent } from './entity-def-list/entity-def-list.component';
 import { DynamicFormFieldComponent } from './dynamic-form-field/dynamic-form-field.component';
-import { EntityDefFormComponent } from './entity-def-form/entity-def-form.component';
 import { PropertyFormComponent } from './property-form/property-form.component';
 import { TbContainerComponent } from './tb-container/tb-container.component';
 import { ModalDialog } from './modal-dialog/modal-dialog';
@@ -24,7 +23,6 @@ import { EntityDefDialogComponent } from './entity-def-dialog/entity-def-dialog.
     EntityListComponent,
     EntityDefListComponent,
     DynamicFormFieldComponent,
-    EntityDefFormComponent,
     PropertyFormComponent,
     TbContainerComponent,
     ModalDialog,

@@ -1,19 +1,18 @@
 
     <div>
-      <entity-def-form *ngIf="isEntityDefFormVisible" [entityDefType]="entityDefType" (onClose)="hideEntityDefForm($event)"></entity-def-form>
       Entity Type: 
       <select id="entityType" (change)="setEntityType($event.target.value)">
           <option *ngFor="let def of entityDefs" [value]="def.name">{{def.name}}</option>
       </select>
       <button  (click)="showEntityDialog()">New Entity</button>
-      <button  (click)="showEntityDefForm()">Edit</button>
+      <button  (click)="openDialog()">Edit</button>
       <div>
       	  <tb-container >
 	      	<entity-list [entities]="entities" (onSelect)="showEntityDialog($event)" (onDelete)="deleteEntity($event)"></entity-list>
 	      </tb-container>
 	      
       	  <tb-container [align]="'right'">
-	      	<entity-def-list [entityDefs]="entityDefs" (onSelect)="showEntityDefForm($event)" (onDelete)="deleteEntityDef($event)"></entity-def-list>
+	      	<entity-def-list [entityDefs]="entityDefs" (onSelect)="showEntityDefDialog($event)" (onDelete)="deleteEntityDef($event)"></entity-def-list>
 	      </tb-container>
       </div>
     </div>

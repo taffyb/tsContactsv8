@@ -8,6 +8,7 @@ import {BaseEntity} from './classes/BaseEntity';
 
 import { MatDialog } from '@angular/material';
 import { ModalDialog, DialogOptions } from './modal-dialog/modal-dialog';
+import { EntityDefDialogComponent } from './entity-def-dialog/entity-def-dialog.component';
 import { EntityDialogComponent } from './entity-dialog/entity-dialog.component';
 
 @Component({
@@ -45,7 +46,7 @@ export class AppComponent implements OnInit {
     }
     async getEntityDefs() {
         this.entityDefs = await this.ds.getEntityDefList();
-        console.log(`${JSON.stringify(this.entityDefs)}`);
+//        console.log(`${JSON.stringify(this.entityDefs)}`);
     }
     async showEntityDialog(uuid:string){
         let entity:IEntity;
@@ -71,9 +72,22 @@ export class AppComponent implements OnInit {
             console.log(`The dialog was closed ${JSON.stringify(result)}`);
           });
     }
-    showEntityDefForm(entityDefType:string){
-        this.entityDefType=entityDefType;
-        this.isEntityDefFormVisible=true;
+    async showEntityDefDialog(entityDefType:string){
+        let entityDef:IEntityDef;
+        let fieldGroups:string[];
+        entityDef= await this.ds.getEntityDef(entityDefType);
+        fieldGroups= await this.ds.getEntityDefGroups(entityDefType);
+        
+
+        const dialogRef = this.dialog.open(EntityDefDialogComponent, {
+            backdropClass:'custom-dialog-backdrop-class',
+            panelClass:'custom-dialog-panel-class',
+            data: {entityDef:entityDef,fieldGroups:fieldGroups}
+          });
+       
+          dialogRef.afterClosed().subscribe(result => {
+            console.log(`The dialog was closed ${JSON.stringify(result)}`);
+          });
     }
     hideEntityForm(status){
 //        console.log(`${status}`);
@@ -104,4 +118,19 @@ export class AppComponent implements OnInit {
     setEntityType(et){
         this.entityType=et;
     }
+    openDialog(): void {
+        const dialogRef = this.dialog.open(ModalDialog, {
+          width: '300px',
+          backdropClass:'custom-dialog-backdrop-class',
+          panelClass:'custom-dialog-panel-class',
+          data: {message: "You have unsaved changes are you sure you want to exit?",
+                 dialogOptions:DialogOptions.OK+DialogOptions.CANCEL+DialogOptions.WARNING
+                }
+        });
+     
+        dialogRef.afterClosed().subscribe(result => {
+          console.log('The dialog was closed',result);
+          this.dialogValue = result.data;
+        });
+      }
 }

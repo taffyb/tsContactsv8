@@ -1,1 +1,33 @@
-<p>entity-def-dialog works!</p>
+
+ <h2 class="title">
+ 
+ 	<img class="icon-small" src="/assets/{{data.entityDef.name}}.svg"/>
+ 	{{data.entityDef.name}}
+ 	<span class="close" (click)="closeDialog()">X</span>
+ </h2>
+ <p>
+ Type: <input type="text" [value]="data.entityDef.name"><br>
+ Display: <input type="text" [value]="data.entityDef.display">
+ <p>
+  
+<form class="form-vertical" (ngSubmit)="onSubmit()" [formGroup]="form">
+   <div class="tabbar">
+	<div *ngFor="let tab of data.fieldGroups" 
+		class="tab" [ngClass]="{ 'active':activeTab==tab }"
+		(click)="activeTab=tab">{{tab}}</div>
+		<div class="tab" (click)="addGroup()">+</div>
+</div>
+   <div *ngFor="let group of data.fieldGroups" 
+		class="group" [ngClass]="{ 'active':activeTab==group }" [style.height]="formHeight">
+    <div *ngFor="let field of getFilteredFields(group)" class="form-row">
+      <div class="property" >{{field.key}}<button mat-raised-button (click)="showProperties(field.key)">...</button></div><br>
+      
+    </div>
+</div>
+<p>
+   <div class="form-row">
+     <button type="submit" [disabled]="!form.valid || !formChanged">Save</button> &nbsp;
+     <button type="button" (click)="closeDialog()">Cancel</button>
+   </div>
+   
+</form>

@@ -1,5 +1,9 @@
 
-  <h2 class="title"><img class="icon-small" src="/assets/{{data.entity.type}}.svg"/>{{data.entity.type}}</h2>
+  <h2 class="title">
+  	<img class="icon-small" src="/assets/{{data.entity.type}}.svg"/>
+  	{{data.entity.type}}
+ 	<span class="close" (click)="closeDialog()">X</span>
+  </h2>
   <form class="form-vertical"  [formGroup]="form">
     <div class="tabbar">
 		<div *ngFor="let tab of data.fieldGroups" 

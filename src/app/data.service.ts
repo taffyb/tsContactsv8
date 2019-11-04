@@ -87,18 +87,6 @@ export class DataService {
                 catchError(this.handleError<any>('getEDefs'))
               );
     }
-    
-//    getEntityDefs():Promise<IEntityDef[]>{
-//        return new Promise<IEntityDef[]>(async (resolve,reject)=>{
-//            if(!this.entityDefList){
-//                this.entityDefList = await this.getEDefs().toPromise();
-////                console.log(`entityDefs: ${JSON.stringify(this.entityDefList)}`);
-//            }
-//            resolve(this.entityDefList);
-//        });
-//    }
-
-
     getEntityDefList(forceRefresh:boolean=false):Promise<IEntityDef[]>{
         return new Promise<IEntityDef[]>(async (resolve,reject)=>{
             if((!this.entityDefList || this.entityDefList===null) || forceRefresh){
