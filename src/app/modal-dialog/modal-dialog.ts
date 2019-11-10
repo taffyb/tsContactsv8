@@ -20,6 +20,7 @@ export class ModalDialog implements OnInit {
   showQuestionIcon:boolean;
   showWarningIcon:boolean;
   showInfoIcon:boolean;
+  isInputBox:boolean;
   dialogOptionsEnum=DialogOptions;
  
   constructor(
@@ -35,6 +36,7 @@ export class ModalDialog implements OnInit {
       this.showWarningIcon=((data.dialogOptions&DialogOptions.WARNING)==DialogOptions.WARNING);
       this.showQuestionIcon=((data.dialogOptions&DialogOptions.QUESTION)==DialogOptions.QUESTION);
       this.showInfoIcon=((data.dialogOptions&DialogOptions.INFO)==DialogOptions.INFO);
+      this.isInputBox=((data.dialogOptions&DialogOptions.INPUT)==DialogOptions.INPUT);
 
       dialogRef.disableClose=((data.dialogOptions&DialogOptions.MANDATORY)==DialogOptions.MANDATORY);
       
@@ -43,8 +45,11 @@ export class ModalDialog implements OnInit {
   ngOnInit() {
   }
   closeDialog(option:DialogOptions){ 
-    this.dialogRef.close({event:'close',data:this.fromDialog}); 
-  }
+    if(this.isInputBox){
+        this.dialogRef.close({event:'close',data:this.fromDialog}); 
+    }else{
+        this.dialogRef.close({event:'close',data:option}); }
+    }
 }
 export enum DialogOptions{
     OK=1,
@@ -54,5 +59,6 @@ export enum DialogOptions{
     QUESTION=16,
     INFO=32,
     WARNING=64,
-    MANDATORY=156
+    MANDATORY=128,
+    INPUT=256
 }

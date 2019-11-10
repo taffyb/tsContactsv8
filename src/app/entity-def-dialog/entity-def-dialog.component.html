@@ -20,14 +20,14 @@
    <div *ngFor="let group of data.fieldGroups" 
 		class="group" [ngClass]="{ 'active':activeTab==group }" [style.height]="formHeight">
     <div *ngFor="let field of getFilteredFields(group)" class="form-row">
-      <div class="property" >{{field.key}}<button mat-raised-button (click)="showProperties(field.key)">...</button></div><br>
+      <div class="property" >{{field.key}}<button mat-raised-button (click)="showPropertyDialog(field)">...</button></div><br>
       
     </div>
 </div>
 <p>
-   <div class="form-row">
-     <button type="submit" [disabled]="!form.valid || !formChanged">Save</button> &nbsp;
-     <button type="button" (click)="closeDialog()">Cancel</button>
-   </div>
+    <div class="form-row">
+      <button mat-raised-button (click)="onSave()" [disabled]="!form.valid || !unsavedChanges">Save</button> &nbsp;
+      <button mat-raised-button (click)="closeDialog()">Cancel</button>
+    </div>
    
 </form>

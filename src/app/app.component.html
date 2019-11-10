@@ -1,11 +1,20 @@
 
     <div>
+    	
       Entity Type: 
       <select id="entityType" (change)="setEntityType($event.target.value)">
           <option *ngFor="let def of entityDefs" [value]="def.name">{{def.name}}</option>
       </select>
-      <button  (click)="showEntityDialog()">New Entity</button>
-      <button  (click)="openDialog()">Edit</button>
+      <button mat-button [matMenuTriggerFor]="appMenu">Menu</button>
+      <mat-menu #appMenu="matMenu">
+	  	  <button mat-menu-item (click)="showEntityDialog()">New Entity</button>
+	  	  <button mat-menu-item (click)="openDialog('This is some info',do.CLOSE+do.INFO)">Info-close</button>
+	  	  <button mat-menu-item (click)="openDialog('Are you sure',do.OK+do.CANCEL+do.WARNING+do.MANDATORY)">Alert</button>
+	  	  <button mat-menu-item (click)="openDialog('Do you want to do this?',do.YES_NO+do.QUESTION)">Question</button>
+	  	  <button mat-menu-item (click)="openDialog('This is some info',do.OK+do.INFO)">Info-ok</button>
+	  </mat-menu>
+      
+      
       <div>
       	  <tb-container >
 	      	<entity-list [entities]="entities" (onSelect)="showEntityDialog($event)" (onDelete)="deleteEntity($event)"></entity-list>

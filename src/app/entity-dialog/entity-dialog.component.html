@@ -20,8 +20,9 @@
 	</div>
 	<p>
     <div class="form-row">
-      <button mat-raised-button (click)="onSave()" [disabled]="!form.valid || !formChanged">Save</button> &nbsp;
+      <button mat-raised-button (click)="onSave()" [disabled]="!form.valid || !unsavedChanges">Save</button> &nbsp;
       <button mat-raised-button (click)="closeDialog()">Cancel</button>
     </div>
+    
   </form>
 

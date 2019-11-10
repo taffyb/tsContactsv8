@@ -16,6 +16,8 @@ import { TbContainerComponent } from './tb-container/tb-container.component';
 import { ModalDialog } from './modal-dialog/modal-dialog';
 import { EntityDialogComponent } from './entity-dialog/entity-dialog.component';
 import { EntityDefDialogComponent } from './entity-def-dialog/entity-def-dialog.component';
+import { PropertyDialogComponent } from './property-dialog/property-dialog.component';
+import { EntityDefFieldComponent } from './entity-def-field/entity-def-field.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +30,8 @@ import { EntityDefDialogComponent } from './entity-def-dialog/entity-def-dialog.
     ModalDialog,
     EntityDialogComponent,
     EntityDefDialogComponent,
+    PropertyDialogComponent,
+    EntityDefFieldComponent,
   ],
   imports: [
     BrowserModule,
@@ -40,6 +44,6 @@ import { EntityDefDialogComponent } from './entity-def-dialog/entity-def-dialog.
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [ ModalDialog, EntityDialogComponent, EntityDefDialogComponent]
+  entryComponents: [ ModalDialog, EntityDialogComponent, EntityDefDialogComponent, PropertyDialogComponent]
 })
 export class AppModule { }

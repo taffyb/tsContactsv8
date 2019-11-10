@@ -9,6 +9,8 @@ import { DataService }    from '../data.service';
 import {IEntityDef} from '../classes/IEntityDef';
 import {IEntity} from '../classes/IEntity';
 import {BaseEntity} from '../classes/BaseEntity';
+import { MatDialog } from '@angular/material';
+import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
 
 @Component({
   selector: 'entity-dialog',
@@ -21,10 +23,13 @@ export class EntityDialogComponent implements OnInit {
     fields: FieldBase<any>[] = [];
     activeTab:string="Details";
     form: FormGroup= new FormGroup({});
+    unsavedChanges:boolean=false;
     formChanged:boolean=false;
     formHeight:string="350px";
+    do=DialogOptions;
 
-    constructor(private fcs: FieldControlService,private fs: FieldService,private ds: DataService,
+    constructor(private fcs: FieldControlService,private fs: FieldService,
+            public dialog: MatDialog,
             public dialogRef: MatDialogRef<EntityDialogComponent>,
             @Optional() @Inject(MAT_DIALOG_DATA) public data: any
             ) {
@@ -41,6 +46,7 @@ export class EntityDialogComponent implements OnInit {
         this.form =this.fcs.toFormGroup(this.fields);
         this.form.valueChanges.subscribe(form => {
             this.formChanged=true;
+            this.unsavedChanges=true;
         });  
           
     }
@@ -49,22 +55,24 @@ export class EntityDialogComponent implements OnInit {
     }
     
     onSave() {
-      let entity=JSON.parse(JSON.stringify(this.form.value));
-      let response;
-      if(this.entity.uuid){
-          entity["uuid"]=this.entity.uuid;
-          entity["type"]=this.entity.type;
-          response = this.ds.updateEntity(entity);
-      }else{
-          entity["type"]=this.entity.type;
-          response = this.ds.addEntity(entity);
-          this.entity=response;
-      }
-      this.formChanged = false;
+      this.unsavedChanges = false;
     }
     
-    closeDialog(){ 
-        this.dialogRef.close({event:'close',data:null}); 
+    async closeDialog(){ 
+        let result:number=DialogOptions.CANCEL;
+        
+        if(this.unsavedChanges){
+            result = await this.openDialog();
+            if(result == DialogOptions.OK){
+                this.dialogRef.close({event:'close',data:null}); 
+            }  
+        }else{
+            if(this.formChanged){
+                this.dialogRef.close({event:'close',data:this.form.getRawValue()});
+            }else{
+                this.dialogRef.close({event:'close',data:null});
+            }
+        }
     }
 
     getFilteredFields(group:string){
@@ -76,4 +84,20 @@ export class EntityDialogComponent implements OnInit {
 //        console.log(`filtered fields:${group} \n${JSON.stringify(fields)}`);
         return fields;
     }
+
+    openDialog(): Promise<number> {
+        return new Promise(async (resolve,reject)=>{
+            const dialogRef = this.dialog.open(ModalDialog, {
+                width: '300px',
+                backdropClass:'custom-dialog-backdrop-class',
+                panelClass:'custom-dialog-panel-class',
+                data: {message: "Are you have unsaved changes.\nAre you sure you want to Exit?",
+                       dialogOptions:DialogOptions.QUESTION+DialogOptions.OK+DialogOptions.CANCEL+DialogOptions.MANDATORY
+                      }
+              });
+             let result= await dialogRef.afterClosed().toPromise();
+             resolve(result.data);
+        });
+        
+      }
 }

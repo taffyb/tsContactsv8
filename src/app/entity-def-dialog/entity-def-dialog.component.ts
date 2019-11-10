@@ -1,5 +1,5 @@
 import { Component, Inject, Optional, OnInit,Input, Output, EventEmitter } from '@angular/core'; 
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog,MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup }                 from '@angular/forms';
 
 import { FieldBase }              from '../classes/field-base';
@@ -9,6 +9,8 @@ import { DataService }    from '../data.service';
 import {IEntityDef} from '../classes/IEntityDef';
 import {IProperty} from '../classes/IProperty';
 import {BaseProperty} from '../classes/BaseProperty';
+import { PropertyDialogComponent } from '../property-dialog/property-dialog.component';
+import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
 
 @Component({
   selector: 'app-entity-def-dialog',
@@ -28,6 +30,7 @@ export class EntityDefDialogComponent implements OnInit {
     fieldGroups:string[];
     title: string="";
     form: FormGroup = new FormGroup({});
+    unsavedChanges:boolean=false;
     formChanged:boolean=false;
     newEntityDefSaved:boolean=false;
     activeTab:string ;
@@ -35,7 +38,7 @@ export class EntityDefDialogComponent implements OnInit {
     
   constructor(private fcs: FieldControlService,private fs: FieldService,private ds: DataService,
           public dialogRef: MatDialogRef<EntityDefDialogComponent>,
-          @Optional() @Inject(MAT_DIALOG_DATA) public data: any
+          @Optional() @Inject(MAT_DIALOG_DATA) public data: any,public dialog: MatDialog
           ) {
       if(data){
           if(data.entityDef){
@@ -52,8 +55,25 @@ export class EntityDefDialogComponent implements OnInit {
   ngOnInit() {
   }
   
-  closeDialog(){ 
-      this.dialogRef.close({event:'close',data:null}); 
+  onSave() {
+    this.unsavedChanges = false;
+  }
+  
+  async closeDialog(){ 
+      let result:number=DialogOptions.CANCEL;
+      
+      if(this.unsavedChanges){
+          result = await this.openDialog();
+          if(result == DialogOptions.OK){
+              this.dialogRef.close({event:'close',data:null}); 
+          }  
+      }else{
+          if(this.formChanged){
+              this.dialogRef.close({event:'close',data:this.form.getRawValue()});
+          }else{
+              this.dialogRef.close({event:'close',data:null});
+          }
+      }
   }
 
   getFilteredFields(group:string){
@@ -64,5 +84,18 @@ export class EntityDefDialogComponent implements OnInit {
       let fields:FieldBase<any>[] = this.fields.filter(filterByGroup);
       console.log(`filtered fields:${group} \n${JSON.stringify(fields)}`);
       return fields;
+  }
+  openPropertyDialog(){
+      let property:IProperty = new BaseProperty();
+      const dialogRef = this.dialog.open(PropertyDialogComponent, {
+          backdropClass:'custom-dialog-backdrop-class',
+          panelClass:'custom-dialog-panel-class',
+          data: {property}
+        });
+     
+        dialogRef.afterClosed().subscribe(result => {
+          console.log(`The dialog was closed ${JSON.stringify(result)}`);
+        });
+      
   }
 }

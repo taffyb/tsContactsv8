@@ -59,17 +59,18 @@ export class DataService {
     }
     
     addEntity (entity:IEntity): Observable<any> {
+        console.log(`addEntity: ${JSON.stringify(entity)}`);
         return  this.http
             .post(this.endpoint + 'entities', JSON.stringify(entity), this.httpOptions).pipe(
-                tap((product) => console.log(`added entity  id=${entity.uuid}`)),
+                tap((result) => console.log(`added entity`)),
                 catchError(this.handleError<any>('addEntity'))
               );
       }
     updateEntity (entity:IEntity): Observable<any> {
-
+        console.log(`updateEntity: ${JSON.stringify(entity)}`);
         return this.http
             .put(this.endpoint + 'entities/' + entity.uuid, JSON.stringify(entity), this.httpOptions).pipe(
-                tap((product) => console.log(`updated entity  id=${entity.uuid}`)),
+                tap((result) => console.log(`updated entity  id=${entity.uuid}`)),
                 catchError(this.handleError<any>('updateEntity'))
               );
       }
@@ -92,9 +93,17 @@ export class DataService {
             if((!this.entityDefList || this.entityDefList===null) || forceRefresh){
                 this.entityDefList = await this.getEDefs().toPromise();
             }
-            resolve(this.entityDefList);
+            resolve(this.entityDefList); 
         });
     }   
+    deleteEntityDef (euuid): Observable<any> {
+        this.entityList=null;
+        return this.http
+            .delete<any>(this.endpoint + 'entity-defs/' + euuid, this.httpOptions).pipe(
+              tap(_ => console.log(`deleted entityDef.uuid=${euuid}`)),
+              catchError(this.handleError<any>('deleteEntity'))
+            );        
+      }
     
     getEntityDefGroups(type:string):Promise<string[]>{
         return new Promise<string[]>(async (resolve,reject)=>{

@@ -25,6 +25,7 @@ export class AppComponent implements OnInit {
     entityDefType:string="Person";
     entities:IEntity[]=[];
     entityDefs:IEntityDef[];
+    do=DialogOptions;
 
     dialogValue:string; 
     sendValue:string;
@@ -67,10 +68,22 @@ export class AppComponent implements OnInit {
             panelClass:'custom-dialog-panel-class',
             data: {entity:entity,entityDef:entityDef,fieldGroups:fieldGroups}
           });
-       
-          dialogRef.afterClosed().subscribe(result => {
-            console.log(`The dialog was closed ${JSON.stringify(result)}`);
-          });
+        dialogRef.disableClose=true;
+        dialogRef.afterClosed().subscribe(async result => {
+            if(result.data!=null){
+                entity.props=[];
+                for(let key in result.data){
+                    entity.props.push({key:key,value:result.data[key]});
+                }
+//              console.log(`The dialog was closed result:${JSON.stringify(result)}\nentity${JSON.stringify(entity)}`);
+                if(uuid){
+                   const update= this.ds.updateEntity(entity).subscribe();
+                }else{
+                   await this.ds.addEntity(entity).toPromise();
+                   this.refreshEntityList();
+                }                
+            }
+        });
     }
     async showEntityDefDialog(entityDefType:string){
         let entityDef:IEntityDef;
@@ -89,22 +102,12 @@ export class AppComponent implements OnInit {
             console.log(`The dialog was closed ${JSON.stringify(result)}`);
           });
     }
-    hideEntityForm(status){
-//        console.log(`${status}`);
-        if(status===true){
-            this.refreshEntityList();
-        }
-        this.isEntityFormVisible=false; 
-    }
-    hideEntityDefForm(){
-        this.isEntityDefFormVisible=false
-    }
     async deleteEntity(uuid:string){
         let response = await this.ds.deleteEntity(uuid).toPromise();
         this.refreshEntityList();
     }
     async deleteEntityDef(uuid:string){
-        let response = await this.ds.deleteEntity(uuid).toPromise();
+        let response = await this.ds.deleteEntityDef(uuid).toPromise();
         this.refreshEntityDefList();
     }
     refreshEntityList(){
@@ -112,24 +115,24 @@ export class AppComponent implements OnInit {
         this.zone.run(async () => this.entities = await this.ds.getEntityList(true));
     }
     refreshEntityDefList(){
-        this.entities=[];
+        this.entityDefs=[];
         this.zone.run(async () => this.entityDefs = await this.ds.getEntityDefList(true));
     }
     setEntityType(et){
         this.entityType=et;
     }
-    openDialog(): void {
+    openDialog(message:string,options:number): void {
         const dialogRef = this.dialog.open(ModalDialog, {
           width: '300px',
           backdropClass:'custom-dialog-backdrop-class',
           panelClass:'custom-dialog-panel-class',
-          data: {message: "You have unsaved changes are you sure you want to exit?",
-                 dialogOptions:DialogOptions.OK+DialogOptions.CANCEL+DialogOptions.WARNING
+          data: {message: message,
+                 dialogOptions:options
                 }
         });
      
         dialogRef.afterClosed().subscribe(result => {
-          console.log('The dialog was closed',result);
+          console.log('The dialog was closed',result.data);
           this.dialogValue = result.data;
         });
       }

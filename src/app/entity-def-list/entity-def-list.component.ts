@@ -19,7 +19,6 @@ export class EntityDefListComponent implements OnInit {
     }
 
     selected(uuid:string){
-        console.log(`entityDef Type ${uuid}`);
         this.onSelect.emit(uuid);        
     }
     delete(uuid:string){

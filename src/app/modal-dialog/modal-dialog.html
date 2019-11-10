@@ -4,12 +4,12 @@
 <img *ngIf="showInfoIcon" class="icon-small" src="/assets/Info.svg"/>
 <img *ngIf="showWarningIcon" class="icon-small" src="/assets/Warning.svg"/>
 {{message}}
-<div>
+<div *ngIf="isInputBox">
   <mat-form-field>
     <input matInput [(ngModel)]="fromDialog" placeholder="Enter value to send back">
   </mat-form-field>
 </div>
-<div >
+<div class="button-row" >
   <button *ngIf="showOk" 
   	mat-raised-button (click)="closeDialog(dialogOptionsEnum.OK)">OK</button>
   <button *ngIf="showClose" 
@@ -17,7 +17,7 @@
   <button *ngIf="showCancel" 
   	mat-raised-button (click)="closeDialog(dialogOptionsEnum.CANCEL)">Cancel</button>
 </div>
-<div *ngIf="showYesNo">
+<div class="button-row" *ngIf="showYesNo">
   <button  mat-raised-button (click)="closeDialog(dialogOptionsEnum.OK)">YES</button>
   <button  mat-raised-button (click)="closeDialog(dialogOptionsEnum.CANCEL)">NO</button>
 </div>
