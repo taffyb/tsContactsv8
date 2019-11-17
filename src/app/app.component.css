@@ -1,3 +1,37 @@
-mat-slider{
-	width:400px;
+body {
+  padding: 2em; 
+  max-height:100%;
 }
+.container {
+  padding-left:10px;
+  display: flex;  
+  flex-flow: column ;
+  height:100%;
+}
+.container > * {
+  flex: 1 100%;
+}
+.header {
+    max-height:5%;
+}
+.footer {
+    max-height:5%;
+  	background: lightgreen;
+}
+.body {
+    max-height:90%;
+	display:flex;
+	flex-flow: row;
+}
+.centre{
+  padding-left:5px;
+  padding-right:5px;
+  flex-basis:60%;
+}
+.left {
+  flex-basis:20%;
+}
+.right {
+  flex-basis:20%;
+}
+
