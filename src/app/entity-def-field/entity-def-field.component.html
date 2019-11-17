@@ -1,1 +1,23 @@
-<p>entity-def-field works!</p>
+<div [formGroup]="form" class="field">
+	Field<span class="field-details" *ngIf="field[5].value" class="required" >*</span>:
+		<div  class="field-label">{{field[1].value}}</div>
+		<div class="show-detail" (click)="toggleEdit()">__</div>		
+	<div *ngIf="edit" >
+		<!-- Group --><label [attr.for]="field[0].key">Tab</label>
+		<select [id]="field[0].key"  [formControlName]="field[0].key">
+	      <option *ngFor="let opt of field[0].options" [value]="opt.key">{{opt.value}}</option>
+	    </select><br>
+		<!-- Name --><label [attr.for]="field[1].key">Name</label>
+		<input [formControlName]="field[1].key" [id]="field.label" type="text"><br>
+		<!-- Type --><label [attr.for]="field[2].key">Type</label>
+		<select [id]="field[2].key"  [formControlName]="field[2].key">
+	      <option *ngFor="let opt of field[2].options" [value]="opt.key">{{opt.value}}</option>
+	    </select><br>
+		<!-- Label --><label [attr.for]="field[3].key">{{field[3].label}}</label>
+		<input [formControlName]="field[3].key" [id]="field.label" type="text"><br>
+		<!-- Order --><label [attr.for]="field[4].key">{{field[4].label}}</label>
+		<input [formControlName]="field[4].key" [id]="field.label" type="text"><br>
+		<!-- Required --><label [attr.for]="field[5].key">{{field[5].label}}</label>
+		<input [formControlName]="field[5].key" [id]="field.label" type="checkbox"><br>
+	</div>
+</div>

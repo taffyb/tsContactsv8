@@ -20,8 +20,7 @@
    <div *ngFor="let group of data.fieldGroups" 
 		class="group" [ngClass]="{ 'active':activeTab==group }" [style.height]="formHeight">
     <div *ngFor="let field of getFilteredFields(group)" class="form-row">
-      <div class="property" >{{field.key}}<button mat-raised-button (click)="showPropertyDialog(field)">...</button></div><br>
-      
+	      <entity-def-field [field]="field" [form]="form"></entity-def-field>
     </div>
 </div>
 <p>

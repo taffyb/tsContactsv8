@@ -1,15 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input,OnInit } from '@angular/core';
+import { FormGroup }        from '@angular/forms';
+
+import { FieldBase }     from '../classes/field-base';
+import { IProperty }     from '../classes/IProperty';
 
 @Component({
-  selector: 'app-entity-def-field',
+  selector: 'entity-def-field',
   templateUrl: './entity-def-field.component.html',
   styleUrls: ['./entity-def-field.component.css']
 })
 export class EntityDefFieldComponent implements OnInit {
+    @Input() field: FieldBase<any>;
+    @Input() form: FormGroup;
+    get isValid() { return this.form.controls[this.field.key].valid; }
+    
+    edit:boolean=false;
 
-  constructor() { }
+    name: string;
+    type: string;
+    label: string;
+    required: boolean;
+    order: number;
 
-  ngOnInit() {
-  }
+    constructor() { }
 
+    ngOnInit() {
+    }
+    toggleEdit(){
+        this.edit = !this.edit;
+    }
 }

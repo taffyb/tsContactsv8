@@ -18,27 +18,25 @@ export class FieldService {
 
   constructor() { }
   
-  getEntityDefFields(entityDef:IEntityDef):FieldBase<any>[] {
-    let fields: FieldBase<any>[] = [];  
+  getEntityDefFields(entityDef:IEntityDef):FieldBase<any>[][] {
+    let allFields:any[][] = [];  
     let defProps={};
+    let groups=[];
 
     entityDef.groups.forEach(group=>{
+        groups.push({key:group.name,value:group.name});
         group.props.forEach(prop=>{
-            let order:number= Number(group.order.toString()+prop.order.toString());
+//            let order:number= Number(group.order.toString()+prop.order.toString());
+        let order:number= prop.order;
             defProps[prop.name]={group:group.name,name:prop.name,type:prop.type,label:prop.label,order:order,required:prop.required};
-
-//          console.log(`defProps[${prop.name}]:${JSON.stringify(defProps[prop.name])}`);
         });
     });
-
-//    console.log(`FieldService.getFields entity: ${JSON.stringify(entity)}\n entityDef: ${JSON.stringify(defProps)}`);
     for(let key in defProps){
-        let field:FieldBase<any>;
-        field= this.contactdb2PropertyType(defProps[key],defProps[key]['group']);
-//        console.log(`FieldService.getFields field: ${JSON.stringify(field)}`);
-        fields.push(field);
+        let fields:FieldBase<any>[];
+        fields= this.fieldsForEntityDefProperty(defProps[key],groups);
+        allFields.push(fields);
     }
-    return fields;
+    return allFields;
   }
 
   getEntityFields(entityDef:IEntityDef,entity:IEntity):FieldBase<any>[] {
@@ -51,12 +49,9 @@ export class FieldService {
         group.props.forEach(prop=>{
             let order:number= Number(group.order.toString()+prop.order.toString());
             defProps[prop.name]={group:group.name,name:prop.name,type:prop.type,label:prop.label,order:order,required:prop.required};
-
-//          console.log(`defProps[${prop.name}]:${JSON.stringify(defProps[prop.name])}`);
         });
     });
 
-//    console.log(`FieldService.getFields entity: ${JSON.stringify(entity)}\n entityDef: ${JSON.stringify(defProps)}`);
     for(let key in defProps){
         let field:FieldBase<any>;
         if(entity){
@@ -65,7 +60,6 @@ export class FieldService {
         }else{
             
             field= this.contactdb2PropertyType(defProps[key],defProps[key]['group']);
-            console.log(`FieldService.getFields field: ${JSON.stringify(field)}`);
         }
         fields.push(field);
     }
@@ -141,4 +135,67 @@ export class FieldService {
     
       return rtn;
   }
+
+  fieldsForEntityDefProperty(p:any,groups:Array<any>):FieldBase<any>[]{
+      let rtn:FieldBase<any>[]=[];
+  
+//      TODO:Make a Select Box
+      rtn.push(new DropdownField({
+              group:p.group,
+              key:p.name+"_group",
+              value:p.group,
+              label:"Group",
+              order:1,
+              required:true,
+              options:groups
+              })
+              );
+      rtn.push(new TextboxField({
+          group:p.group,
+          key:p.name+"_name",
+          value:p.name,
+          label:"Name",
+          order:2,
+          required:true})
+      );
+      rtn.push(new DropdownField({
+          group:p.group,
+          key:p.name+"_type",
+          value:p.type,
+          label:"Type",
+          order:3,
+          required:true,
+          options:[{key:'string',value:'string'},
+                   {key:'date',value:'date'},
+                   {key:'memo',value:'memo'},
+                   {key:'email',value:'email'},
+                   {key:'true-false',value:'true-false'},
+                   {key:'list',value:'list'}]
+      })
+      );
+      rtn.push(new TextboxField({
+          group:p.group,
+          key:p.name+"label",
+          value:p.label,
+          label:"Label",
+          order:4})
+      );
+      rtn.push(new TextboxField({
+          group:p.group,
+          key:p.name+"_order",
+          value:p.order,
+          label:"Order",
+          order:5})
+      );
+      rtn.push(new CheckboxField({
+          group:p.group,
+          key:p.name+"_required",
+          value:p.required,
+          label:"Required",
+          order:6})
+      );
+  
+      return rtn;
+  }
 }
+1

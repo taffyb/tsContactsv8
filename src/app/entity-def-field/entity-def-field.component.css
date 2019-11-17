@@ -1,0 +1,19 @@
+.required{
+	color:red;
+}
+
+.field{
+	border:1px solid black;
+}
+label {
+  display: inline-block;
+  min-width: 70px;
+}
+.field-label{
+  display: inline-block;
+}
+.show-detail{
+  display: inline-block;
+  float:right;
+  cursor:pointer;
+}

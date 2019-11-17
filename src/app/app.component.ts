@@ -72,16 +72,16 @@ export class AppComponent implements OnInit {
         dialogRef.afterClosed().subscribe(async result => {
             if(result.data!=null){
                 entity.props=[];
+                console.log(`result.data: ${JSON.stringify(result.data)}`);
                 for(let key in result.data){
                     entity.props.push({key:key,value:result.data[key]});
                 }
-//              console.log(`The dialog was closed result:${JSON.stringify(result)}\nentity${JSON.stringify(entity)}`);
                 if(uuid){
-                   const update= this.ds.updateEntity(entity).subscribe();
+                   await this.ds.updateEntity(entity).toPromise();
                 }else{
                    await this.ds.addEntity(entity).toPromise();
-                   this.refreshEntityList();
-                }                
+                } 
+                this.refreshEntityList();               
             }
         });
     }

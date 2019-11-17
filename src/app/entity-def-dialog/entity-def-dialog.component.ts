@@ -27,6 +27,7 @@ export class EntityDefDialogComponent implements OnInit {
     
     display:string;
     fields: FieldBase<any>[] = [];
+    allFields: FieldBase<any>[][] = [];
     fieldGroups:string[];
     title: string="";
     form: FormGroup = new FormGroup({});
@@ -42,11 +43,17 @@ export class EntityDefDialogComponent implements OnInit {
           ) {
       if(data){
           if(data.entityDef){
-              this.fields = this.fs.getEntityDefFields(data.entityDef);
+              this.allFields = this.fs.getEntityDefFields(data.entityDef);
               this.activeTab=data.fieldGroups[0];
+              this.allFields.forEach(fieldSet=>{
+                  fieldSet.forEach(field=>{
+                      this.fields.push(field);
+                  });
+              });
           }
       }
       this.form =this.fcs.toFormGroup(this.fields);
+      console.log(`constructor this.fields: ${JSON.stringify(this.fields)}`);
       this.form.valueChanges.subscribe(form => {
           this.formChanged=true;
       }); 
@@ -62,6 +69,7 @@ export class EntityDefDialogComponent implements OnInit {
   async closeDialog(){ 
       let result:number=DialogOptions.CANCEL;
       
+      console.log(`Close Entity Def Dialog: ${JSON.stringify(this.form.getRawValue())}`);
       if(this.unsavedChanges){
           result = await this.openDialog();
           if(result == DialogOptions.OK){
@@ -74,15 +82,16 @@ export class EntityDefDialogComponent implements OnInit {
               this.dialogRef.close({event:'close',data:null});
           }
       }
+      
   }
 
   getFilteredFields(group:string){
       
       let filterByGroup = (element, index, array) =>{      
-          return (element.group == group); 
+          return (element[0].group == group); 
       } 
-      let fields:FieldBase<any>[] = this.fields.filter(filterByGroup);
-      console.log(`filtered fields:${group} \n${JSON.stringify(fields)}`);
+      let fields:FieldBase<any>[][] = this.allFields.filter(filterByGroup);
+//      console.log(`filtered fields:${group} \n${JSON.stringify(fields)}`);
       return fields;
   }
   openPropertyDialog(){
@@ -94,8 +103,26 @@ export class EntityDefDialogComponent implements OnInit {
         });
      
         dialogRef.afterClosed().subscribe(result => {
+          console.log(`Close Entity Def Dialog: ${JSON.stringify(this.form.getRawValue())}`);
           console.log(`The dialog was closed ${JSON.stringify(result)}`);
         });
       
   }
+
+
+  openDialog(): Promise<number> {
+      return new Promise(async (resolve,reject)=>{
+          const dialogRef = this.dialog.open(ModalDialog, {
+              width: '300px',
+              backdropClass:'custom-dialog-backdrop-class',
+              panelClass:'custom-dialog-panel-class',
+              data: {message: "Are you have unsaved changes.\nAre you sure you want to Exit?",
+                     dialogOptions:DialogOptions.QUESTION+DialogOptions.OK+DialogOptions.CANCEL+DialogOptions.MANDATORY
+                    }
+            });
+           let result= await dialogRef.afterClosed().toPromise();
+           resolve(result.data);
+      });
+      
+    }
 }
