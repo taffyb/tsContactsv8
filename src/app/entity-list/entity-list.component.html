@@ -1,10 +1,14 @@
 <div class="list">
   <div class="title">{{title}}</div>
-  <div class="list-item" *ngFor="let entity of entities" >
-    <span (click)="selected(entity.uuid)">
-	  	<img class="icon-small" src="/assets/{{entity.type}}.svg"/>
-	  	{{entity.display}}
-  	</span>
-  	<span class="delete" (click)="delete(entity.uuid)">X</span>
+  <div class="list-item">
+  	<input type="checkbox" [(ngModel)]="selectAll" (click)="onSelectAll()">Show All
+  </div>
+  <div class="list-item" *ngFor="let e of entities" >
+    	<input type="checkbox" [(ngModel)]="e.options.check" (click)="checked(e.entity.uuid)">
+	    <span (click)="selected(e.entity.uuid)">
+		  	<img class="icon-small" src="/assets/{{e.entity.type}}.svg"/>
+		  	{{e.entity.display}}
+	  	</span>
+  		<span class="delete" (click)="delete(e.entity.uuid)">X</span>
   </div>
 </div>

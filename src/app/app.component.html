@@ -1,5 +1,3 @@
-
-
 <div class="container">
   <header class="header">
       Entity Type: 
@@ -9,17 +7,18 @@
       <button mat-button [matMenuTriggerFor]="appMenu">Menu</button>
       <mat-menu #appMenu="matMenu">
 	  	  <button mat-menu-item (click)="showEntityDialog()">New Entity</button>
-	  	  <button mat-menu-item (click)="openDialog('This is some info',do.CLOSE+do.INFO)">Info-close</button>
-	  	  <button mat-menu-item (click)="openDialog('Are you sure',do.OK+do.CANCEL+do.WARNING+do.MANDATORY)">Alert</button>
+	  	  <button mat-menu-item (click)="openEntityTemplate(entityType)">Generate Entity Template</button>
+	  	  <button mat-menu-item (click)="showEntityUploadDialog()">Upload Entities</button>
 	  	  <button mat-menu-item (click)="openDialog('Do you want to do this?',do.YES_NO+do.QUESTION)">Question</button>
 	  	  <button mat-menu-item (click)="openDialog('This is some info',do.OK+do.INFO)">Info-ok</button>
 	  </mat-menu></header>
+	  
   <div class="body">
   	<div class="left"> 
       	<entity-list [entities]="entities" (onSelect)="showEntityDialog($event)" (onDelete)="deleteEntity($event)"></entity-list>
 	</div>
   	<div class="centre">
-  		Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.
+  		<app-canvas></app-canvas>
   	</div>
   	<div class="right">
   		<entity-def-list [entityDefs]="entityDefs" (onSelect)="showEntityDefDialog($event)" (onDelete)="deleteEntityDef($event)"></entity-def-list>
@@ -27,38 +26,3 @@
   </div>
   <footer class="footer">Footer</footer>
 </div>
-
-
-
-<!-- 
-<div class="main-container">
-	<div class="header">
-      Entity Type: 
-      <select id="entityType" (change)="setEntityType($event.target.value)">
-          <option *ngFor="let def of entityDefs" [value]="def.name">{{def.name}}</option>
-      </select>
-      <button mat-button [matMenuTriggerFor]="appMenu">Menu</button>
-      <mat-menu #appMenu="matMenu">
-	  	  <button mat-menu-item (click)="showEntityDialog()">New Entity</button>
-	  	  <button mat-menu-item (click)="openDialog('This is some info',do.CLOSE+do.INFO)">Info-close</button>
-	  	  <button mat-menu-item (click)="openDialog('Are you sure',do.OK+do.CANCEL+do.WARNING+do.MANDATORY)">Alert</button>
-	  	  <button mat-menu-item (click)="openDialog('Do you want to do this?',do.YES_NO+do.QUESTION)">Question</button>
-	  	  <button mat-menu-item (click)="openDialog('This is some info',do.OK+do.INFO)">Info-ok</button>
-	  </mat-menu>
-	</div>
-	<div class="body">
-		<div class="body-row">
-		    <div class="panel left"> 
-		      	<entity-list [entities]="entities" (onSelect)="showEntityDialog($event)" (onDelete)="deleteEntity($event)"></entity-list>
-	      	</div>
-	      	<div class="panel centre">
-	      	&nbsp;
-	      	</div>
-	      	<div class="panel right">
-	      		<entity-def-list [entityDefs]="entityDefs" (onSelect)="showEntityDefDialog($event)" (onDelete)="deleteEntityDef($event)"></entity-def-list>
-	      	</div>
-		</div>
-	</div>
-	<div class="footer">Footer</div>
-</div>
- -->

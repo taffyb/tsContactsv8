@@ -18,6 +18,8 @@ import { EntityDialogComponent } from './entity-dialog/entity-dialog.component';
 import { EntityDefDialogComponent } from './entity-def-dialog/entity-def-dialog.component';
 import { PropertyDialogComponent } from './property-dialog/property-dialog.component';
 import { EntityDefFieldComponent } from './entity-def-field/entity-def-field.component';
+import { CanvasComponent } from './canvas/canvas.component';
+import { EntityUploadDialogComponent } from './entity-upload-dialog/entity-upload-dialog.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +34,8 @@ import { EntityDefFieldComponent } from './entity-def-field/entity-def-field.com
     EntityDefDialogComponent,
     PropertyDialogComponent,
     EntityDefFieldComponent,
+    CanvasComponent,
+    EntityUploadDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -44,6 +48,10 @@ import { EntityDefFieldComponent } from './entity-def-field/entity-def-field.com
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [ ModalDialog, EntityDialogComponent, EntityDefDialogComponent, PropertyDialogComponent]
+  entryComponents: [ ModalDialog, 
+                     EntityDialogComponent, 
+                     EntityDefDialogComponent, 
+                     PropertyDialogComponent,
+                     EntityUploadDialogComponent]
 })
 export class AppModule { }

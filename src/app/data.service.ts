@@ -145,5 +145,17 @@ export class DataService {
             }
         });
     }
-    
+    uploadEntityTemplate(files:File[]): Observable<any> {
+                
+        const httpOptions:any = {
+                headers: new HttpHeaders({"Content-Type":"text/plain"})
+        };
+        return this.http
+            .post(this.endpoint + 'template', files, httpOptions).pipe(
+                tap((result) => console.log(`added entity`)),
+                catchError(this.handleError<any>('addEntity'))
+        );
+    }
 }
+
+        

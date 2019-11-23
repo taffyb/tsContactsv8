@@ -1,4 +1,5 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit} from '@angular/core';
+
 
 import { FieldService } from './field.service';
 import { DataService } from './data.service';
@@ -10,6 +11,7 @@ import { MatDialog } from '@angular/material';
 import { ModalDialog, DialogOptions } from './modal-dialog/modal-dialog';
 import { EntityDefDialogComponent } from './entity-def-dialog/entity-def-dialog.component';
 import { EntityDialogComponent } from './entity-dialog/entity-dialog.component';
+import { EntityUploadDialogComponent } from './entity-upload-dialog/entity-upload-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -17,13 +19,11 @@ import { EntityDialogComponent } from './entity-dialog/entity-dialog.component';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-    fields: any[];
-    isEntityFormVisible:boolean=false;
-    isEntityDefFormVisible:boolean=false;
-    euuid:string="";
+
     entityType:string="Person";
+    entityTypeUuid:string="";
     entityDefType:string="Person";
-    entities:IEntity[]=[];
+    entities:{options:{},entity:IEntity}[]=[];
     entityDefs:IEntityDef[];
     do=DialogOptions;
 
@@ -32,10 +32,6 @@ export class AppComponent implements OnInit {
     
     constructor(private fs: FieldService,private  ds:DataService,
             public zone: NgZone,public dialog: MatDialog) {
-        ds.getEntityDefList()
-            .then(data => {
-                this.entityDefs = data;
-            });
     }    
     ngOnInit() {
         console.log(`AppComponent.ngOnInit`);
@@ -43,11 +39,15 @@ export class AppComponent implements OnInit {
         this.getEntityDefs();
     }
     async getEntities() {
-        this.entities = await this.ds.getEntityList();
+        let entities:IEntity[];
+        this.entities=[];
+        entities = await this.ds.getEntityList(true);
+        entities.forEach(e=>{
+            this.entities.push({options:{check:false},entity:e});
+        });
     }
     async getEntityDefs() {
         this.entityDefs = await this.ds.getEntityDefList();
-//        console.log(`${JSON.stringify(this.entityDefs)}`);
     }
     async showEntityDialog(uuid:string){
         let entity:IEntity;
@@ -85,6 +85,21 @@ export class AppComponent implements OnInit {
             }
         });
     }
+    showEntityUploadDialog(){
+        const dialogRef = this.dialog.open(EntityUploadDialogComponent, {
+            backdropClass:'custom-dialog-backdrop-class',
+            panelClass:'custom-dialog-panel-class',
+            data: {}
+          });
+       
+          dialogRef.afterClosed().subscribe(result => {
+              if(result.data !== null){
+                  this.refreshEntityList();
+              }else{
+                  console.log(`The dialog was canceled`);
+              }            
+          });
+    }
     async showEntityDefDialog(entityDefType:string){
         let entityDef:IEntityDef;
         let fieldGroups:string[];
@@ -111,11 +126,12 @@ export class AppComponent implements OnInit {
         this.refreshEntityDefList();
     }
     refreshEntityList(){
-        this.entities=[];
-        this.zone.run(async () => this.entities = await this.ds.getEntityList(true));
+//        this.entities=[];
+//        this.zone.run(async () => this.entities = await this.ds.getEntityList(true));
+        this.zone.run(async ()=> this.getEntities());
     }
     refreshEntityDefList(){
-        this.entityDefs=[];
+//        this.entityDefs=[];
         this.zone.run(async () => this.entityDefs = await this.ds.getEntityDefList(true));
     }
     setEntityType(et){
@@ -136,4 +152,9 @@ export class AppComponent implements OnInit {
           this.dialogValue = result.data;
         });
       }
+    async openEntityTemplate(entityType:string){
+        const e= await this.ds.getEntityDef(entityType);
+
+        window.location.href = `http://localhost:4001/api/template/${e.uuid}`;
+    }
 }
