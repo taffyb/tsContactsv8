@@ -18,7 +18,7 @@
       	<entity-list [entities]="entities" (onSelect)="showEntityDialog($event)" (onDelete)="deleteEntity($event)"></entity-list>
 	</div>
   	<div class="centre">
-  		<app-canvas></app-canvas>
+  		<app-canvas [data]="data" (onSelect)="showEntityDialog($event)"></app-canvas>
   	</div>
   	<div class="right">
   		<entity-def-list [entityDefs]="entityDefs" (onSelect)="showEntityDefDialog($event)" (onDelete)="deleteEntityDef($event)"></entity-def-list>

@@ -12,6 +12,7 @@ import { ModalDialog, DialogOptions } from './modal-dialog/modal-dialog';
 import { EntityDefDialogComponent } from './entity-def-dialog/entity-def-dialog.component';
 import { EntityDialogComponent } from './entity-dialog/entity-dialog.component';
 import { EntityUploadDialogComponent } from './entity-upload-dialog/entity-upload-dialog.component';
+import {Data} from './data/data';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +27,7 @@ export class AppComponent implements OnInit {
     entities:{options:{},entity:IEntity}[]=[];
     entityDefs:IEntityDef[];
     do=DialogOptions;
+    data=Data;
 
     dialogValue:string; 
     sendValue:string;
@@ -34,7 +36,6 @@ export class AppComponent implements OnInit {
             public zone: NgZone,public dialog: MatDialog) {
     }    
     ngOnInit() {
-        console.log(`AppComponent.ngOnInit`);
         this.getEntities();
         this.getEntityDefs();
     }

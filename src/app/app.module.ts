@@ -20,6 +20,7 @@ import { PropertyDialogComponent } from './property-dialog/property-dialog.compo
 import { EntityDefFieldComponent } from './entity-def-field/entity-def-field.component';
 import { CanvasComponent } from './canvas/canvas.component';
 import { EntityUploadDialogComponent } from './entity-upload-dialog/entity-upload-dialog.component';
+import { RelationshipDialogComponent } from './relationship-dialog/relationship-dialog.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { EntityUploadDialogComponent } from './entity-upload-dialog/entity-uploa
     EntityDefFieldComponent,
     CanvasComponent,
     EntityUploadDialogComponent,
+    RelationshipDialogComponent,
   ],
   imports: [
     BrowserModule,
