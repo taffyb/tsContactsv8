@@ -294,10 +294,10 @@ import { DataModel } from '../data/data.model';
       g.append("svg:image")
         .attr("pointer-events","none")
         .attr("xlink:href",  function(d) { return '/assets/'+d.type+'.svg';})
-        .attr("x", function(d) { return -10;})
-        .attr("y", function(d) { return -10;})
-        .attr("height", this.NODE_RADIUS*2-4)
-        .attr("width", this.NODE_RADIUS*2-4);
+        .attr("x", function(d) { return -9;})
+        .attr("y", function(d) { return -9;})
+        .attr("height", (this.NODE_RADIUS*2)-6)
+        .attr("width", (this.NODE_RADIUS*2)-6);
       
       // show node IDs
       g.append('svg:text')
