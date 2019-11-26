@@ -54,6 +54,7 @@ import { RelationshipDialogComponent } from './relationship-dialog/relationship-
                      EntityDialogComponent, 
                      EntityDefDialogComponent, 
                      PropertyDialogComponent,
-                     EntityUploadDialogComponent]
+                     EntityUploadDialogComponent,
+                     RelationshipDialogComponent]
 })
 export class AppModule { }

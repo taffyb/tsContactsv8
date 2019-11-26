@@ -23,7 +23,7 @@ export class EntityListComponent implements OnInit {
           public zone: NgZone) { }
 
   ngOnInit() {
-      console.log(`EntityList ${JSON.stringify(this.entities)}`);
+//      console.log(`EntityList ${JSON.stringify(this.entities)}`);
   }
 
   selected(uuid:string){

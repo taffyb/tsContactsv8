@@ -46,7 +46,7 @@ export class PropertyFormComponent implements OnInit {
       let fields:FieldBase<any>[]=[];
       let field:FieldBase<any>;
   
-      console.log(`${JSON.stringify(p)}`);
+//      console.log(`${JSON.stringify(p)}`);
       field=new TextboxField({
           key:'name',
           value:p.name,
@@ -85,7 +85,7 @@ export class PropertyFormComponent implements OnInit {
           order:4});
       fields.push(field);
 
-      console.log(`${JSON.stringify(fields)}`);
+//      console.log(`${JSON.stringify(fields)}`);
       return fields;
   }
 }

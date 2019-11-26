@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
     entityDefs:IEntityDef[];
     do=DialogOptions;
     data=Data;
+    dialogOpen:boolean=false;
 
     dialogValue:string; 
     sendValue:string;
@@ -51,6 +52,7 @@ export class AppComponent implements OnInit {
         this.entityDefs = await this.ds.getEntityDefList();
     }
     async showEntityDialog(uuid:string){
+        this.dialogOpen=true;
         let entity:IEntity;
         let entityDef:IEntityDef;
         let fieldGroups:string[];
@@ -73,7 +75,7 @@ export class AppComponent implements OnInit {
         dialogRef.afterClosed().subscribe(async result => {
             if(result.data!=null){
                 entity.props=[];
-                console.log(`result.data: ${JSON.stringify(result.data)}`);
+//                console.log(`result.data: ${JSON.stringify(result.data)}`);
                 for(let key in result.data){
                     entity.props.push({key:key,value:result.data[key]});
                 }
@@ -82,11 +84,13 @@ export class AppComponent implements OnInit {
                 }else{
                    await this.ds.addEntity(entity).toPromise();
                 } 
-                this.refreshEntityList();               
+                this.refreshEntityList();  
+                this.dialogOpen=false;             
             }
         });
     }
     showEntityUploadDialog(){
+        this.dialogOpen=true;
         const dialogRef = this.dialog.open(EntityUploadDialogComponent, {
             backdropClass:'custom-dialog-backdrop-class',
             panelClass:'custom-dialog-panel-class',
@@ -97,11 +101,13 @@ export class AppComponent implements OnInit {
               if(result.data !== null){
                   this.refreshEntityList();
               }else{
-                  console.log(`The dialog was canceled`);
-              }            
+//                  console.log(`The dialog was canceled`);
+              }  
+              this.dialogOpen=false;          
           });
     }
     async showEntityDefDialog(entityDefType:string){
+        this.dialogOpen=true;
         let entityDef:IEntityDef;
         let fieldGroups:string[];
         entityDef= await this.ds.getEntityDef(entityDefType);
@@ -115,7 +121,7 @@ export class AppComponent implements OnInit {
           });
        
           dialogRef.afterClosed().subscribe(result => {
-            console.log(`The dialog was closed ${JSON.stringify(result)}`);
+              this.dialogOpen=false;
           });
     }
     async deleteEntity(uuid:string){
@@ -139,6 +145,7 @@ export class AppComponent implements OnInit {
         this.entityType=et;
     }
     openDialog(message:string,options:number): void {
+        this.dialogOpen=true;
         const dialogRef = this.dialog.open(ModalDialog, {
           width: '300px',
           backdropClass:'custom-dialog-backdrop-class',
@@ -149,8 +156,9 @@ export class AppComponent implements OnInit {
         });
      
         dialogRef.afterClosed().subscribe(result => {
-          console.log('The dialog was closed',result.data);
+//          console.log('The dialog was closed',result.data);
           this.dialogValue = result.data;
+          this.dialogOpen=false;
         });
       }
     async openEntityTemplate(entityType:string){

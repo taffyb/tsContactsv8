@@ -22,7 +22,7 @@ export class TbContainerComponent implements OnInit {
   }
   onMouseMove(e){
       if(this.mouseDown){
-          console.log(`mouseX:${e.movementX}`);
+//          console.log(`mouseX:${e.movementX}`);
       }
       
   }

@@ -4,9 +4,9 @@ export interface DataModel {
 }
 
 interface Node{
-    id:number,
+    id?:number,
     reflexive:boolean,
-	uuid?:string,
+	uuid:string,
 	type?:string,
 	label?:string,
 	x?:number,

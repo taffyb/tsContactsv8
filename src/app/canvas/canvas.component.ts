@@ -12,14 +12,15 @@ import { DataModel } from '../data/data.model';
     private canvas: ElementRef;
 
     @Input()data: DataModel;
+    @Input()dialogOpen: boolean=false;
     @Output()onSelect:EventEmitter<string> = new EventEmitter<string>();
-//    @HostListener('window:keyup', ['$event'])
-//    keyEvent(event: KeyboardEvent) {
-//      console.log(event);
-//    }
+
     width = 960;
     height = 600;
     colors = d3.scaleOrdinal(d3.schemeCategory10);
+    NODE_RADIUS=12;
+    ENTITY_COLOURS={Person:"red",Organisation:"blue",Event:"green"};
+    
 
     svg: any;
     force: any;
@@ -35,31 +36,21 @@ import { DataModel } from '../data/data.model';
     mousedownNode = null;
     mouseupNode = null;
     
-    dialogOpen=false;
     
     lastNodeId = 2;
     // only respond once per keydown
     lastKeyDown = -1;
 
     nodes;
-//    links=this.data.links;
-//    nodes = [
-//      { id: 0, reflexive: false },
-//      { id: 1, reflexive: false },
-//      { id: 2, reflexive: false }
-//    ];
     links;
-    mouseoverCanvas(){
-        this.dialogOpen=false;
-    }
+
     ngOnInit(){
-        console.log(`Init Canvas\n${JSON.stringify(this.data)}`);
     }
     ngAfterContentInit() {
       this.nodes=this.data.nodes;
       this.links= [
-                     { source: this.nodes[0], target: this.nodes[1], left: false, right: true },
-                     { source: this.nodes[1], target: this.nodes[2], left: false, right: true }
+                     { source: this.nodes[0], target: this.nodes[1], left: true, right: false,label:"WORKS_FOR" },
+                     { source: this.nodes[1], target: this.nodes[2], left: false, right: true,label:"MARRIED_TO" }
                    ];
       const rect = this.canvas.nativeElement.getBoundingClientRect();
 //      console.log(rect.width, rect.height);
@@ -135,7 +126,7 @@ import { DataModel } from '../data/data.model';
       this.circle = this.svg.append('svg:g').selectAll('g');
 
       // app starts here
-      this.svg.on('mousedown', (dataItem, value, source) => this.mousedown(dataItem, value, source))
+      this.svg.on('mousedown', (dataItem, value, source) => this.addNode(dataItem, value, source))
         .on('mousemove', (dataItem) => this.mousemove(dataItem))
         .on('mouseup', (dataItem) => this.mouseup(dataItem));
       d3.select(window)
@@ -144,7 +135,15 @@ import { DataModel } from '../data/data.model';
       this.restart();
     }
 
-
+    setEntityColour(d){
+        let colour;
+        if(this.ENTITY_COLOURS[d.type]){
+           colour=this.ENTITY_COLOURS[d.type];
+        }else{
+            colour="grey";
+        }
+        return colour;
+    }
     // update force layout (called automatically each iteration)
     tick() {
       // draw directed edges with proper padding from node centers
@@ -220,12 +219,12 @@ import { DataModel } from '../data/data.model';
 
       g.append('svg:circle')
         .attr('class', 'node')
-        .attr('r', 12)
+        .attr('r', this.NODE_RADIUS)
         .style('fill', (d) => (d === this.selectedNode) ? d3.rgb(this.colors(d.id)).brighter().toString() : this.colors(d.id))
         .style('stroke', (d) => d3.rgb(this.colors(d.id)).darker().toString())
         .classed('reflexive', (d) => d.reflexive)
         .on('dblclick',(d)=>{
-            this.dialogOpen=true;
+            this.resetMouseVars();
             this.onSelect.emit(d.uuid);
         })
         .on('mouseover', function (d) {
@@ -243,7 +242,7 @@ import { DataModel } from '../data/data.model';
           this.mousedownNode = d;
           this.selectedNode = (this.mousedownNode === this.selectedNode) ? null : this.mousedownNode;
           this.selectedLink = null;
-
+    
           // reposition drag line
           this.dragLine
             .style('marker-end', 'url(#end-arrow)')
@@ -251,7 +250,7 @@ import { DataModel } from '../data/data.model';
             .attr('d', `M${this.mousedownNode.x},${this.mousedownNode.y}L${this.mousedownNode.x},${this.mousedownNode.y}`);
 
           this.restart();
-          console.log(`mousedown: ${this.selectedNode}`);
+//          console.log(`mousedown: ${this.selectedNode}`);
         })
         .on('mouseup', (dataItem: any) => {
 //          debugger;
@@ -268,7 +267,7 @@ import { DataModel } from '../data/data.model';
             this.resetMouseVars();
             return;
           }
-
+          
           // unenlarge target node
           d3.select(d3.event.currentTarget).attr('transform', '');
 
@@ -282,7 +281,7 @@ import { DataModel } from '../data/data.model';
           if (link) {
             link[isRight ? 'right' : 'left'] = true;
           } else {
-            this.links.push({ source, target, left: !isRight, right: isRight });
+            this.links.push({ source, target, left: !isRight, right: isRight,label:"" });
           }
 
           // select new link
@@ -291,10 +290,19 @@ import { DataModel } from '../data/data.model';
           this.restart();
         });
 
+      // Append images
+      g.append("svg:image")
+        .attr("pointer-events","none")
+        .attr("xlink:href",  function(d) { return '/assets/'+d.type+'.svg';})
+        .attr("x", function(d) { return -10;})
+        .attr("y", function(d) { return -10;})
+        .attr("height", this.NODE_RADIUS*2-4)
+        .attr("width", this.NODE_RADIUS*2-4);
+      
       // show node IDs
       g.append('svg:text')
         .attr('x', 0)
-        .attr('y', 4)
+        .attr('y', 24)
         .attr('class', 'id')
         .text((d) => d.label);
 
@@ -308,11 +316,11 @@ import { DataModel } from '../data/data.model';
       this.force.alphaTarget(0.3).restart();
     }
 
-    mousedown(dataItem: any, value: any, source: any) {
+    addNode(dataItem: any, value: any, source: any) {
       // because :active only works in WebKit?
       this.svg.classed('active', true);
 
-      if (d3.event.ctrlKey || this.mousedownNode || this.mousedownLink) return;
+      if (!d3.event.ctrlKey || this.mousedownNode || this.mousedownLink) return;
 
       // insert new node at point
       const point = d3.mouse(d3.event.currentTarget);
@@ -381,6 +389,7 @@ import { DataModel } from '../data/data.model';
             this.restart();
             break;
           case 66: // B
+            console.log(`B`);
             if (this.selectedLink) {
               // set link direction to both left and right
               this.selectedLink.left = true;
@@ -389,6 +398,7 @@ import { DataModel } from '../data/data.model';
             this.restart();
             break;
           case 76: // L
+              console.log(`L`);
             if (this.selectedLink) {
               // set link direction to left only
               this.selectedLink.left = true;
@@ -397,6 +407,7 @@ import { DataModel } from '../data/data.model';
             this.restart();
             break;
           case 82: // R
+             console.log(`R`);
             if (this.selectedNode) {
               // toggle node reflexivity
               this.selectedNode.reflexive = !this.selectedNode.reflexive;

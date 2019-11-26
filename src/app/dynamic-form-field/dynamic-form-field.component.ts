@@ -11,5 +11,8 @@ import { FieldBase }     from '../classes/field-base';
 export class DynamicFormFieldComponent {
   @Input() field: FieldBase<any>;
   @Input() form: FormGroup;
-  get isValid() { console.log(`${this.field.key}`);return this.form.controls[this.field.key].valid; }
+  get isValid() { 
+      //console.log(`${this.field.key}`);
+      return this.form.controls[this.field.key].valid; 
+      }
 }

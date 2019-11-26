@@ -53,7 +53,7 @@ export class EntityDefDialogComponent implements OnInit {
           }
       }
       this.form =this.fcs.toFormGroup(this.fields);
-      console.log(`constructor this.fields: ${JSON.stringify(this.fields)}`);
+//      console.log(`constructor this.fields: ${JSON.stringify(this.fields)}`);
       this.form.valueChanges.subscribe(form => {
           this.formChanged=true;
       }); 
@@ -69,7 +69,7 @@ export class EntityDefDialogComponent implements OnInit {
   async closeDialog(){ 
       let result:number=DialogOptions.CANCEL;
       
-      console.log(`Close Entity Def Dialog: ${JSON.stringify(this.form.getRawValue())}`);
+//      console.log(`Close Entity Def Dialog: ${JSON.stringify(this.form.getRawValue())}`);
       if(this.unsavedChanges){
           result = await this.openDialog();
           if(result == DialogOptions.OK){
@@ -103,8 +103,8 @@ export class EntityDefDialogComponent implements OnInit {
         });
      
         dialogRef.afterClosed().subscribe(result => {
-          console.log(`Close Entity Def Dialog: ${JSON.stringify(this.form.getRawValue())}`);
-          console.log(`The dialog was closed ${JSON.stringify(result)}`);
+//          console.log(`Close Entity Def Dialog: ${JSON.stringify(this.form.getRawValue())}`);
+//          console.log(`The dialog was closed ${JSON.stringify(result)}`);
         });
       
   }

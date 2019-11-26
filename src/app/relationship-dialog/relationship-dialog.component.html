@@ -1,1 +1,16 @@
-<p>relationship-dialog works!</p>
+  <h2 class="title">
+  	<img class="icon-small" src="/assets/link.svg"/>
+  	{{relationship}}
+ 	<span class="close" (click)="closeDialog()">X</span>
+  </h2>
+  Entity: {{relationship.entity1.display}}
+  Rel:<input type="text" list="labels" />
+	<datalist id="labels" [ngModel]="relationship.label">
+	    <option *ngFor="let l of labels" value="l">
+	</datalist>
+  Entity: {{relationship.entity2.display}}
+  <div class="form-row">
+      <button mat-raised-button (click)="onSave()" [disabled]="!form.valid || !unsavedChanges">Save</button> &nbsp;
+      <button mat-raised-button (click)="closeDialog()">Cancel</button>
+  </div>
+    

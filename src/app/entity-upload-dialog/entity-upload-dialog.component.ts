@@ -36,18 +36,18 @@ export class EntityUploadDialogComponent implements OnInit {
       }
     }
     onSubmit() {
-      console.log(`onSubmit`);
+//      console.log(`onSubmit`);
         
       const formData = new FormData();
       formData.append('file', this.uploadForm.get('profile').value);
 
       this.httpClient.post<any>(this.SERVER_URL, formData).subscribe(
         (res) => {
-                console.log(res);
+//                console.log(res);
                 this.dialogRef.close({event:'close',data:"submit"});
             },
         (err) => {
-            console.log(err);
+//            console.log(err);
             this.dialogRef.close({event:'close',data:"submit"});}
       );
       
