@@ -3,8 +3,7 @@ import { Component, NgZone, OnInit} from '@angular/core';
 
 import { FieldService } from './field.service';
 import { DataService } from './data.service';
-import {IEntityDef} from './classes/IEntityDef';
-import {IEntity} from './classes/IEntity';
+import {IEntityDef, IEntity} from './classes/interfaces';
 import {BaseEntity} from './classes/BaseEntity';
 
 import { MatDialog } from '@angular/material';

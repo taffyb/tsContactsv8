@@ -1,7 +1,7 @@
 import { Component, OnInit,Input, Output, EventEmitter, Inject, Optional } from '@angular/core'; 
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
-import {IRelationship} from '../classes/IRelationship';
+import {IRelationship} from '../classes/interfaces';
 
 @Component({
   selector: 'app-relationship-dialog',

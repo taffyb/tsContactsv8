@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, NgZone } from '@angular/core';
 
-import {IEntity} from '../classes/IEntity';
-import {IEntityDef} from '../classes/IEntityDef';
+import {IEntity, IEntityDef} from '../classes/interfaces';
 import { DataService }    from '../data.service';
 
 import { MatDialog } from '@angular/material';

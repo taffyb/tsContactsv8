@@ -7,9 +7,7 @@ import { CheckboxField }  from './classes/field-checkbox';
 import { TextareaField }  from './classes/field-textarea';
 import { HLineField }  from './classes/field-hr';
 
-import {IEntityDef} from './classes/IEntityDef';
-import {IEntity} from './classes/IEntity';
-import {IProperty} from './classes/IProperty';
+import {IEntityDef, IEntity, IProperty} from './classes/interfaces';
 
 @Injectable({
   providedIn: 'root'

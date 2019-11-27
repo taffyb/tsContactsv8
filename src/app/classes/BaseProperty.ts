@@ -1,4 +1,4 @@
-import {IProperty} from './IProperty';
+import {IProperty} from './interfaces';
 
 export class BaseProperty implements IProperty{
     name: string="";

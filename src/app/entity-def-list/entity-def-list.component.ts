@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter  } from '@angular/core';
-import {IEntityDef} from '../classes/IEntityDef';
+import {IEntityDef} from '../classes/interfaces';
 
 @Component({
   selector: 'entity-def-list',

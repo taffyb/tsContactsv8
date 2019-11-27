@@ -2,7 +2,7 @@ import { Component, Input,OnInit } from '@angular/core';
 import { FormGroup }        from '@angular/forms';
 
 import { FieldBase }     from '../classes/field-base';
-import { IProperty }     from '../classes/IProperty';
+import { IProperty }     from '../classes/interfaces';
 
 @Component({
   selector: 'entity-def-field',

@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef, Input, Output, OnInit,EventEmitter,HostListener } from '@angular/core';
 import * as d3 from 'd3';
-import { DataModel } from '../data/data.model';
+import { DataModel,Node, Link } from '../classes/data.model';
 
 @Component({
     selector: 'app-canvas',
@@ -41,19 +41,22 @@ import { DataModel } from '../data/data.model';
     // only respond once per keydown
     lastKeyDown = -1;
 
-    nodes;
-    links;
+    nodes=[];
+    nodeMap={};
+    links=[];
 
     ngOnInit(){
     }
     ngAfterContentInit() {
+      this.nodeMap = this.nodesToMap(this.data.nodes);
       this.nodes=this.data.nodes;
-      this.links= [
-                     { source: this.nodes[0], target: this.nodes[1], left: true, right: false,label:"WORKS_FOR" },
-                     { source: this.nodes[1], target: this.nodes[2], left: false, right: true,label:"MARRIED_TO" }
-                   ];
+      this.data.links.forEach(l=>{
+          this.links.push({ source: this.getNodeByUuid(l.source), 
+                            target: this.getNodeByUuid(l.target), 
+                            left: l.left, right: l.right,
+                            label:l.label })
+      });
       const rect = this.canvas.nativeElement.getBoundingClientRect();
-//      console.log(rect.width, rect.height);
       
       d3.select('svg').remove();
       const element = this.canvas.nativeElement;
@@ -430,5 +433,16 @@ import { DataModel } from '../data/data.model';
         this.circle.on('.drag', null);
         this.svg.classed('ctrl', false);
       }
+    }
+    
+    nodesToMap(nodes:Node[]):any{
+        const map={};
+        nodes.forEach((n,i)=>{
+            map[n.uuid]=n;
+        });
+        return map;
+    }
+    getNodeByUuid(uuid:string):Node{
+        return this.nodeMap[uuid];
     }
   }

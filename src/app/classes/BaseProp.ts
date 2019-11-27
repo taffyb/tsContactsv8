@@ -1,4 +1,4 @@
-import {IProp} from './IProp';
+import {IProp} from './interfaces';
 
 export class BaseProp implements IProp{
     key:string;

@@ -1,7 +1,7 @@
 import { Component, Inject, Optional, OnInit,Input, Output, EventEmitter } from '@angular/core'; 
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
-import {IProperty} from '../classes/IProperty';
+import {IProperty} from '../classes/interfaces';
 import { FormGroup } from '@angular/forms';
 
 import { FieldControlService } from '../field-control.service';

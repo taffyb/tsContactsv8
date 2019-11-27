@@ -3,9 +3,7 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, of, EMPTY, observable } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 
-import {IEntityDef} from './classes/IEntityDef';
-import {IEntity} from './classes/IEntity';
-import {IPropertyGroup} from './classes/IPropertyGroup';
+import {IEntityDef, IEntity, IPropertyGroup} from './classes/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -144,6 +142,9 @@ export class DataService {
                 reject();
             }
         });
+    }
+    getRelationships(uuid): Observable<IEntity> {
+        return this.http.get<IEntity>(this.endpoint + 'relationships');
     }
     uploadEntityTemplate(files:File[]): Observable<any> {
                 

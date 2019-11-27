@@ -1,5 +1,4 @@
-import {IEntity} from './IEntity';
-import {IProp} from './IProp';
+import {IEntity, IProp} from './interfaces';
 
 export class BaseEntity implements IEntity{
     type:string="";

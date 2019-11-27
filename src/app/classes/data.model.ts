@@ -3,7 +3,7 @@ export interface DataModel {
   links: Link[];
 }
 
-interface Node{
+export interface Node{
     id?:number,
     reflexive:boolean,
 	uuid:string,
@@ -12,7 +12,7 @@ interface Node{
 	x?:number,
 	y?:number
 }
-interface Link{
+export interface Link{
 	source:string,
 	target:string,
 	label:string,
