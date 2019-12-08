@@ -1,0 +1,14 @@
+div.row{
+	border-bottom: 5px;
+}
+div.lable{
+	float:left;
+	width:25%;
+}
+div.value{
+	float:left;
+	width:75%;
+}
+form{
+	width:600px;
+}

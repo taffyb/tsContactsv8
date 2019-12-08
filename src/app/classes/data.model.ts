@@ -13,6 +13,7 @@ export interface Node{
 	y?:number
 }
 export interface Link{
+    uuid:string,
 	source:string,
 	target:string,
 	label:string,

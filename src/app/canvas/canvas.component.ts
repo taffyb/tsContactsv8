@@ -2,6 +2,9 @@ import { Component, ViewChild, ElementRef, Input, Output, OnInit,EventEmitter,Ho
 import * as d3 from 'd3';
 import { DataModel,Node, Link } from '../classes/data.model';
 
+import { MatDialog } from '@angular/material';
+import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
+
 @Component({
     selector: 'app-canvas',
     templateUrl: './canvas.component.html',
@@ -13,7 +16,8 @@ import { DataModel,Node, Link } from '../classes/data.model';
 
     @Input()data: DataModel;
     @Input()dialogOpen: boolean=false;
-    @Output()onSelect:EventEmitter<string> = new EventEmitter<string>();
+    @Output()onSelectEntity:EventEmitter<string> = new EventEmitter<string>();
+    @Output()onSelectRelationship:EventEmitter<{}> = new EventEmitter<{}>();
 
     width = 960;
     height = 600;
@@ -45,6 +49,10 @@ import { DataModel,Node, Link } from '../classes/data.model';
     nodeMap={};
     links=[];
 
+    showTick=true;
+    
+    constructor(public dialog: MatDialog){
+    }
     ngOnInit(){
     }
     ngAfterContentInit() {
@@ -54,8 +62,31 @@ import { DataModel,Node, Link } from '../classes/data.model';
           this.links.push({ source: this.getNodeByUuid(l.source), 
                             target: this.getNodeByUuid(l.target), 
                             left: l.left, right: l.right,
-                            label:l.label })
+                            label:l.label, 
+                            uuid:l.uuid,
+                            linkNum:1})
       });
+    //sort links by source, then target
+      this.links=this.links.sort(function(a,b) {
+          if (a.source.uuid > b.source.uuid) {return 1;}
+          else if (a.source.uuid < b.source.uuid) {return -1;}
+          else {
+              if (a.target.uuid > b.target.uuid) {return 1;}
+              if (a.target.uuid < b.target.uuid) {return -1;}
+              else {return 0;}
+          }
+      });
+      //any links with duplicate source and target get an incremented 'linknum'
+      for (var i=0; i<this.links.length; i++) {
+          if (i != 0 &&
+              this.links[i].source.uuid == this.links[i-1].source.uuid &&
+              this.links[i].target.uuid == this.links[i-1].target.uuid) {
+              this.links[i].linknum = this.links[i-1].linknum + 1;
+              console.log(`link ${JSON.stringify(this.links[i])}`);
+          }else {
+              this.links[i].linknum = 1;
+          }
+      }
       const rect = this.canvas.nativeElement.getBoundingClientRect();
       
       d3.select('svg').remove();
@@ -74,7 +105,10 @@ import { DataModel,Node, Link } from '../classes/data.model';
         .force('x', d3.forceX(this.width / 2))
         .force('y', d3.forceY(this.height / 2))
         .on('tick', () => this.tick());
-
+        
+//      this.force.drag()
+//        .on("dragstart",this.dragstart);
+      
       // init D3 drag support
       this.drag = d3.drag()
         .on('start', (d: any) => {
@@ -147,28 +181,49 @@ import { DataModel,Node, Link } from '../classes/data.model';
         }
         return colour;
     }
+    
     // update force layout (called automatically each iteration)
     tick() {
       // draw directed edges with proper padding from node centers
       this.path.attr('d', (d: any) => {
-        const deltaX = d.target.x - d.source.x;
-        const deltaY = d.target.y - d.source.y;
-        const dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const normX = deltaX / dist;
-        const normY = deltaY / dist;
-        const sourcePadding = d.left ? 17 : 12;
-        const targetPadding = d.right ? 17 : 12;
-        const sourceX = d.source.x + (sourcePadding * normX);
-        const sourceY = d.source.y + (sourcePadding * normY);
-        const targetX = d.target.x - (targetPadding * normX);
-        const targetY = d.target.y - (targetPadding * normY);
+          
+         /**      X
+          *  __________
+          *  |        /
+          *  |       /
+          *  |      /
+          * Y|     /Z
+          *  |    /
+          *  |   /
+          *  |  /
+          *  | /
+          *  |/
+          */
+        const lenX = d.target.x - d.source.x;                     //calculate the difference between the target and source X positions
+        const lenY = d.target.y - d.source.y;                     //calculate the difference between the target and source Y positions
+        const lenZ = Math.sqrt(lenX * lenX + lenY * lenY);        //calculate the length of Z (Z=sqrt(X^2 + Y^2)
+        const normX = lenX / lenZ;                                 
+        const normY = lenY / lenZ;
+        const sourceX = d.source.x + (this.NODE_RADIUS * normX);     //calculate start(source) & end(target) of path
+        const sourceY = d.source.y + (this.NODE_RADIUS * normY);
+        const targetX = d.target.x - (this.NODE_RADIUS * normX);
+        const targetY = d.target.y - (this.NODE_RADIUS * normY);
+        const dr = 400/(d.linknum - (d.linknum%2));  // dr determines distance from centre path. We only want to change dr every second line so we get pairs.
 
-        return `M${sourceX},${sourceY}L${targetX},${targetY}`;
+
+        let pattern="";
+        if(d.linknum>1){
+            const sweep = (d.linknum-1)%2; //determines which side the path arcs. 0=>left, 1=>right
+            pattern= `M ${sourceX},${sourceY} A ${dr} ${dr} 0 0 ${sweep} ${targetX} ${targetY}`;
+        }else{
+            pattern= `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`;
+        }
+        return pattern;
       });
-
+      
       this.circle.attr('transform', (d) => `translate(${d.x},${d.y})`);
     }
-
+    
     resetMouseVars() {
       this.mousedownNode = null;
       this.mouseupNode = null;
@@ -181,7 +236,10 @@ import { DataModel,Node, Link } from '../classes/data.model';
       this.path = this.path.data(this.links);
 
       // update existing links
-      this.path.classed('selected', (d) => d === this.selectedLink)
+      this.path.classed('selected', (d) => { 
+          let isSelectedLink= (this.selectedLink?d.uuid === this.selectedLink.uuid:false);
+          return isSelectedLink;
+        })
         .style('marker-start', (d) => d.left ? 'url(#start-arrow)' : '')
         .style('marker-end', (d) => d.right ? 'url(#end-arrow)' : '');
 
@@ -191,27 +249,39 @@ import { DataModel,Node, Link } from '../classes/data.model';
       // add new links
       this.path = this.path.enter().append('svg:path')
         .attr('class', 'link')
-        .classed('selected', (d) => d === this.selectedLink)
+        .classed('selected', (d) => this.selectedLink?d.uuid === this.selectedLink.uuid:false)
         .style('marker-start', (d) => d.left ? 'url(#start-arrow)' : '')
         .style('marker-end', (d) => d.right ? 'url(#end-arrow)' : '')
+        .on('dblclick', (d)=>{
+            this.dialogOpen=true;
+            if(d.left){
+                this.onSelectRelationship.emit({uuid:d.uuid,sourceUuid:d.target.uuid,targetUuid:d.source.uuid,label:d.label});
+            }else{
+                this.onSelectRelationship.emit({uuid:d.uuid,sourceUuid:d.source.uuid,targetUuid:d.target.uuid,label:d.label});
+            }
+            this.resetMouseVars();
+            this.restart();
+        })
         .on('mousedown', (d) => {
           if (d3.event.ctrlKey) return;
-
+              
           // select link
           this.mousedownLink = d;
           this.selectedLink = (this.mousedownLink === this.selectedLink) ? null : this.mousedownLink;
           this.selectedNode = null;
+
           this.restart();
         })
         .merge(this.path);
 
       // circle (node) group
       // NB: the function arg is crucial here! nodes are known by id, not by index!
-      this.circle = this.circle.data(this.nodes, (d) => d.id);
+      this.circle = this.circle.data(this.nodes, (d) => d.uuid);//d.id);
 
       // update existing nodes (reflexive & selected visual states)
       this.circle.selectAll('circle')
-        .style('fill', (d) => (d === this.selectedNode) ? d3.rgb(this.colors(d.id)).brighter().toString() : this.colors(d.id))
+        .style('fill', (d) => this.setEntityColour(d))//(d === this.selectedNode) ? d3.rgb(this.colors(d.id)).brighter().toString() : this.colors(d.id))
+        .style('stroke', (d) => d === this.selectedNode ? 'lime' : "black")//d3.rgb(this.colors(d.id)).darker().toString())
         .classed('reflexive', (d) => d.reflexive);
 
       // remove old nodes
@@ -223,12 +293,12 @@ import { DataModel,Node, Link } from '../classes/data.model';
       g.append('svg:circle')
         .attr('class', 'node')
         .attr('r', this.NODE_RADIUS)
-        .style('fill', (d) => (d === this.selectedNode) ? d3.rgb(this.colors(d.id)).brighter().toString() : this.colors(d.id))
-        .style('stroke', (d) => d3.rgb(this.colors(d.id)).darker().toString())
+        .style('fill', (d) => this.setEntityColour(d))//(d === this.selectedNode) ? d3.rgb(this.colors(d.id)).brighter().toString() : this.colors(d.id))
+        .style('stroke', (d) => "black")//d3.rgb(this.colors(d.id)).darker().toString())
         .classed('reflexive', (d) => d.reflexive)
         .on('dblclick',(d)=>{
             this.resetMouseVars();
-            this.onSelect.emit(d.uuid);
+            this.onSelectEntity.emit(d.uuid);
         })
         .on('mouseover', function (d) {
           // enlarge target node
@@ -240,12 +310,12 @@ import { DataModel,Node, Link } from '../classes/data.model';
         })
         .on('mousedown', (d) => {
           if (d3.event.ctrlKey) return;
-
           // select node
           this.mousedownNode = d;
           this.selectedNode = (this.mousedownNode === this.selectedNode) ? null : this.mousedownNode;
           this.selectedLink = null;
-    
+          this.dialogOpen=false;
+//          d3.select(d3.event.currentTarget).attr('stroke', 'lime');
           // reposition drag line
           this.dragLine
             .style('marker-end', 'url(#end-arrow)')
@@ -272,7 +342,8 @@ import { DataModel,Node, Link } from '../classes/data.model';
           }
           
           // unenlarge target node
-          d3.select(d3.event.currentTarget).attr('transform', '');
+          d3.select(d3.event.currentTarget)
+              .attr('transform', '');
 
           // add link to graph (update if exists)
           // NB: links are strictly source < target; arrows separately specified by booleans
@@ -296,13 +367,13 @@ import { DataModel,Node, Link } from '../classes/data.model';
       // Append images
       g.append("svg:image")
         .attr("pointer-events","none")
-        .attr("xlink:href",  function(d) { return '/assets/'+d.type+'.svg';})
-        .attr("x", function(d) { return -9;})
-        .attr("y", function(d) { return -9;})
+        .attr("xlink:href",  (d) =>{ return '/assets/'+d.type+'.svg';})
+        .attr("x", (d) =>{ return -9;})
+        .attr("y", (d) =>{ return -9;})
         .attr("height", (this.NODE_RADIUS*2)-6)
         .attr("width", (this.NODE_RADIUS*2)-6);
       
-      // show node IDs
+      // show node Labels
       g.append('svg:text')
         .attr('x', 0)
         .attr('y', 24)
@@ -365,8 +436,8 @@ import { DataModel,Node, Link } from '../classes/data.model';
       }
     }
 
-    keydown() {
-
+    async keydown() {
+      let result:DialogOptions;
       if (this.lastKeyDown !== -1) return;
       this.lastKeyDown = d3.event.keyCode;
 
@@ -376,30 +447,35 @@ import { DataModel,Node, Link } from '../classes/data.model';
         this.svg.classed('ctrl', true);
       }
 
+      console.log(`dialogOpen:${this.dialogOpen}`);
       if(!this.dialogOpen){
       switch (d3.event.keyCode) {
           case 8: // backspace
           case 46: // delete
             console.log(`backspace/delete`);
-            if (this.selectedNode) {
-              this.nodes.splice(this.nodes.indexOf(this.selectedNode), 1);
-              this.spliceLinksForNode(this.selectedNode);
-            } else if (this.selectedLink) {
-              this.links.splice(this.links.indexOf(this.selectedLink), 1);
-            }
-            this.selectedLink = null;
-            this.selectedNode = null;
-            this.restart();
+            result = await this.openDialog("Are you sure you want to delete this Entity/Link.",
+                    DialogOptions.QUESTION+DialogOptions.OK+DialogOptions.CANCEL);
+            if(result == DialogOptions.OK){
+                if (this.selectedNode) {
+                  this.nodes.splice(this.nodes.indexOf(this.selectedNode), 1);
+                  this.spliceLinksForNode(this.selectedNode);
+                } else if (this.selectedLink) {
+                  this.links.splice(this.links.indexOf(this.selectedLink), 1);
+                }
+                this.selectedLink = null;
+                this.selectedNode = null;
+                this.restart();
+            } 
             break;
-          case 66: // B
-            console.log(`B`);
-            if (this.selectedLink) {
-              // set link direction to both left and right
-              this.selectedLink.left = true;
-              this.selectedLink.right = true;
-            }
-            this.restart();
-            break;
+//          case 66: // B
+//            console.log(`B`);
+//            if (this.selectedLink) {
+//              // set link direction to both left and right
+//              this.selectedLink.left = true;
+//              this.selectedLink.right = true;
+//            }
+//            this.restart();
+//            break;
           case 76: // L
               console.log(`L`);
             if (this.selectedLink) {
@@ -445,4 +521,24 @@ import { DataModel,Node, Link } from '../classes/data.model';
     getNodeByUuid(uuid:string):Node{
         return this.nodeMap[uuid];
     }
+
+    dragstart(d){
+        d3.select(d).classed("fixed", d.fixed = true);        
+    }
+ 
+    openDialog(message:string,options:number): Promise<number> {
+        return new Promise(async (resolve,reject)=>{
+            const dialogRef = this.dialog.open(ModalDialog, {
+                width: '300px',
+                backdropClass:'custom-dialog-backdrop-class',
+                panelClass:'custom-dialog-panel-class',
+                data: {message: message,
+                       dialogOptions:options+DialogOptions.MANDATORY
+                      }
+              });
+             let result= await dialogRef.afterClosed().toPromise();
+             resolve(result.data);
+        });
+        
+      }
   }

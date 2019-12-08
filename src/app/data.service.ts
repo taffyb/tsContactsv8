@@ -146,6 +146,11 @@ export class DataService {
     getRelationships(uuid): Observable<IEntity> {
         return this.http.get<IEntity>(this.endpoint + 'relationships');
     }
+    getRelationshipTypes(sourceType:string,targetType:string): Observable<string[]> {
+        console.log(`data Service GET ${this.endpoint}relationships?types=${sourceType}&types=${targetType}`);
+        return this.http.get<string[]>(`${this.endpoint}relationships?types=${sourceType}&types=${targetType}`);
+    }
+    
     uploadEntityTemplate(files:File[]): Observable<any> {
                 
         const httpOptions:any = {

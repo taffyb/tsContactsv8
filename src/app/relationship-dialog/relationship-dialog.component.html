@@ -1,16 +1,31 @@
+
+<form class="form-vertical">
   <h2 class="title">
   	<img class="icon-small" src="/assets/link.svg"/>
-  	{{relationship}}
+  	{{relationship.label}}
  	<span class="close" (click)="closeDialog()">X</span>
   </h2>
-  Entity: {{relationship.entity1.display}}
-  Rel:<input type="text" list="labels" />
-	<datalist id="labels" [ngModel]="relationship.label">
-	    <option *ngFor="let l of labels" value="l">
-	</datalist>
-  Entity: {{relationship.entity2.display}}
+  <p>
   <div class="form-row">
-      <button mat-raised-button (click)="onSave()" [disabled]="!form.valid || !unsavedChanges">Save</button> &nbsp;
+  	<div class="label" >From Entity:</div>
+  	<div class="value">{{relationship.source.display}}</div>
+  </div>
+  <div class="form-row">
+  	<div class="label" >Rel:</div>
+  	<div class="value">
+	  	<input name="rellabel" type="text" list="labels" [(ngModel)]="relationship.label"/>
+		<datalist  id="labels"  >
+		    <option *ngFor="let l of labels" [value]="l">{{l}}</option>
+		</datalist>
+	</div>
+  </div>   
+  <div class="form-row">
+  	<div class="label" >To Entity:</div>
+  	<div class="value">{{relationship.target.display}}</div>
+  </div>
+  <p>
+  <div class="form-row">
+      <button mat-raised-button (click)="onSave()" >Save</button> &nbsp;
       <button mat-raised-button (click)="closeDialog()">Cancel</button>
   </div>
-    
+</form>

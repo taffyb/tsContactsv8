@@ -3,12 +3,14 @@ import { Component, NgZone, OnInit} from '@angular/core';
 
 import { FieldService } from './field.service';
 import { DataService } from './data.service';
-import {IEntityDef, IEntity} from './classes/interfaces';
+import {IEntityDef, IEntity,IRelationship} from './classes/interfaces';
 import {BaseEntity} from './classes/BaseEntity';
+import {BaseRelationship} from './classes/BaseRelationship';
 
 import { MatDialog } from '@angular/material';
 import { ModalDialog, DialogOptions } from './modal-dialog/modal-dialog';
 import { EntityDefDialogComponent } from './entity-def-dialog/entity-def-dialog.component';
+import { RelationshipDialogComponent } from './relationship-dialog/relationship-dialog.component';
 import { EntityDialogComponent } from './entity-dialog/entity-dialog.component';
 import { EntityUploadDialogComponent } from './entity-upload-dialog/entity-upload-dialog.component';
 import {Data} from './data/data';
@@ -43,12 +45,41 @@ export class AppComponent implements OnInit {
         let entities:IEntity[];
         this.entities=[];
         entities = await this.ds.getEntityList(true);
+        this.data.nodes=[];
         entities.forEach(e=>{
             this.entities.push({options:{check:false},entity:e});
+            this.data.nodes.push({uuid:e.uuid,type:e.type,label:e.display,reflexive:false});
         });
     }
     async getEntityDefs() {
         this.entityDefs = await this.ds.getEntityDefList();
+    }
+    async showRelationshipDialog(rel:any){
+        let relationship:IRelationship;
+        const source = await this.ds.getEntity(rel.sourceUuid).toPromise();
+        const target = await this.ds.getEntity(rel.targetUuid).toPromise();
+        relationship=new BaseRelationship();
+        relationship.source=source;
+        relationship.target=target;  
+        relationship.label=rel.label;
+        if(rel.uuid){ 
+            relationship.uuid=rel.uuid;
+        }
+        const labels = await this.ds.getRelationshipTypes(source.type, target.type).toPromise();
+
+        console.log(`labels:${JSON.stringify(labels)}`);
+        const dialogRef = this.dialog.open(RelationshipDialogComponent, {
+            backdropClass:'custom-dialog-backdrop-class',
+            panelClass:'custom-dialog-panel-class',
+            data: {relationship:relationship,labels:labels}
+          });
+        dialogRef.disableClose=true;
+        dialogRef.afterClosed().subscribe(async result => {
+            if(result.data!=null){
+                console.log(`showRelationshipDialog.close ${JSON.stringify(result.data)}`);
+                this.zone.run(() =>this.dialogOpen=false);          
+            }
+        });
     }
     async showEntityDialog(uuid:string){
         this.dialogOpen=true;
@@ -83,8 +114,8 @@ export class AppComponent implements OnInit {
                 }else{
                    await this.ds.addEntity(entity).toPromise();
                 } 
-                this.refreshEntityList();  
-                this.dialogOpen=false;             
+                this.refreshEntityList();
+                this.zone.run(() =>this.dialogOpen=false);          
             }
         });
     }
@@ -102,7 +133,7 @@ export class AppComponent implements OnInit {
               }else{
 //                  console.log(`The dialog was canceled`);
               }  
-              this.dialogOpen=false;          
+              this.zone.run(() =>this.dialogOpen=false);         
           });
     }
     async showEntityDefDialog(entityDefType:string){
@@ -120,7 +151,7 @@ export class AppComponent implements OnInit {
           });
        
           dialogRef.afterClosed().subscribe(result => {
-              this.dialogOpen=false;
+              this.zone.run(() =>this.dialogOpen=false);
           });
     }
     async deleteEntity(uuid:string){
@@ -157,7 +188,7 @@ export class AppComponent implements OnInit {
         dialogRef.afterClosed().subscribe(result => {
 //          console.log('The dialog was closed',result.data);
           this.dialogValue = result.data;
-          this.dialogOpen=false;
+          this.zone.run(() =>this.dialogOpen=false);
         });
       }
     async openEntityTemplate(entityType:string){

@@ -30,7 +30,8 @@ export interface IProperty{
     order: number;
 }
 export interface IRelationship{
-    fromEntity:IEntity;
-    toEntity:IEntity;
+    uuid:string;
+    source:IEntity;
+    target:IEntity;
     label:string;
 }
