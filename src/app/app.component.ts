@@ -106,6 +106,7 @@ export class AppComponent implements OnInit {
             entityDef= await this.ds.getEntityDef(this.entityType);
             fieldGroups= await this.ds.getEntityDefGroups(this.entityType);
         }
+        console.log(`uuid:[${uuid}] entity:${JSON.stringify(entity)}`);
         const dialogRef = this.dialog.open(EntityDialogComponent, {
             backdropClass:'custom-dialog-backdrop-class',
             panelClass:'custom-dialog-panel-class',

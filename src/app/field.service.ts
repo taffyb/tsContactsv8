@@ -41,8 +41,8 @@ export class FieldService {
 
     let fields: FieldBase<any>[] = [];  
     let defProps={};
-
-    if(entity){console.log(`entityDef:${JSON.stringify(entityDef)}\nentity:${JSON.stringify(entity)}`);}
+//    console.log(`1. entity:${JSON.stringify(entity)}`);
+//   if(entity){console.log(`entityDef:${JSON.stringify(entityDef)}\nentity:${JSON.stringify(entity)}`);}
     entityDef.groups.forEach(group=>{
         group.props.forEach(prop=>{
             let order:number= Number(group.order.toString()+prop.order.toString());
@@ -50,21 +50,31 @@ export class FieldService {
         });
     });
 
+//turn the entity.property array into an object
+    let props={};    
+    if(entity){
+        entity.props.forEach(prop=>{
+            if(!(prop.key==="uuid" || prop.key==="display" || prop.key==="type")){
+                props[prop.key]=prop.value;
+            }
+        });
+    }
+    
     for(let key in defProps){
         let field:FieldBase<any>;
         if(entity){
-            field= this.contactdb2PropertyType(defProps[key],defProps[key]['group'],entity.props[key]);
-            delete entity.props[key];
-        }else{
-            
+            field= this.contactdb2PropertyType(defProps[key],defProps[key]['group'],props[key]);
+            delete props[key];
+        }else{            
             field= this.contactdb2PropertyType(defProps[key],defProps[key]['group']);
         }
         fields.push(field);
     }
+//    console.log(`2. entity:${JSON.stringify(entity)}`);
     if(entity){
-        for(let key in entity.props){
+        for(let key in props){
             if(key !=='uuid'){
-                let field:FieldBase<any> = this.contactdb2PropertyType(key,'Default',entity.props[key]);
+                let field:FieldBase<any> = this.contactdb2PropertyType(key,'Default',props[key]);
                 fields.push(field);
             }
          }

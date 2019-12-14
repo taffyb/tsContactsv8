@@ -76,19 +76,17 @@ export class DataService {
          });
     }
 
-    getEntity(uuid): Observable<IEntity> {
-        
+    getEntity(uuid): Observable<IEntity> {      
         return new Observable<IEntity>((observer) => {
-            let entity:IEntity;
             if(!this.entityMap[uuid]){
                 this.http.get<IEntity>(this.endpoint + 'entities/' + uuid).subscribe(e=>{
                     this.entityMap[uuid]=e;
-                    console.log(`add to entityMap[${uuid}]:${JSON.stringify(this.entityMap[uuid])}`);
+//                    console.log(`add to entityMap[${uuid}]:${JSON.stringify(this.entityMap[uuid])}`);
                     observer.next(this.entityMap[uuid]);
                     observer.complete();
                 });
             }else{
-                console.log(`get from entityMap[${uuid}]:${JSON.stringify(this.entityMap[uuid])}`);
+//                console.log(`get from entityMap[${uuid}]:${JSON.stringify(this.entityMap[uuid])}`);
                 observer.next(this.entityMap[uuid]);
                 observer.complete();
             }
