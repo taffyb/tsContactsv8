@@ -1,9 +1,13 @@
-import { Component, ViewChild, ElementRef, Input, Output, OnInit,EventEmitter,HostListener } from '@angular/core';
+import { 
+    Component, ViewChild, ElementRef, Input, 
+    Output, OnInit,EventEmitter,HostListener 
+    } from '@angular/core';
 import * as d3 from 'd3';
 import { DataModel,Node, Link } from '../classes/data.model';
 
 import { MatDialog } from '@angular/material';
 import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
+
 
 @Component({
     selector: 'app-canvas',
@@ -14,9 +18,14 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
     @ViewChild('canvas', {read: ElementRef,static:true})   
     private canvas: ElementRef;
 
-    @Input()data: DataModel;
+    _data: DataModel;
+    @Input()set data(value: DataModel) {
+        this._data = value;
+        this.renderCanvas();
+    }
     @Input()dialogOpen: boolean=false;
     @Output()onSelectEntity:EventEmitter<string> = new EventEmitter<string>();
+    @Output()onDeleteEntity:EventEmitter<string> = new EventEmitter<string>();
     @Output()onSelectRelationship:EventEmitter<{}> = new EventEmitter<{}>();
 
     width = 960;
@@ -25,7 +34,6 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
     NODE_RADIUS=12;
     ENTITY_COLOURS={Person:"red",Organisation:"blue",Event:"green"};
     
-
     svg: any;
     force: any;
     path: any;
@@ -39,7 +47,6 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
     mousedownLink = null;
     mousedownNode = null;
     mouseupNode = null;
-    
     
     lastNodeId = 2;
     // only respond once per keydown
@@ -55,10 +62,13 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
     }
     ngOnInit(){
     }
-    ngAfterContentInit() {
-      this.nodeMap = this.nodesToMap(this.data.nodes);
-      this.nodes=this.data.nodes;
-      this.data.links.forEach(l=>{
+
+    renderCanvas(){
+        
+//      console.log(`${JSON.stringify(this.nodes)}`);
+      this.nodeMap = this.nodesToMap(this._data.nodes);
+      this.nodes=this._data.nodes;
+      this._data.links.forEach(l=>{
           this.links.push({ source: this.getNodeByUuid(l.source), 
                             target: this.getNodeByUuid(l.target), 
                             left: l.left, right: l.right,
@@ -112,8 +122,7 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
       // init D3 drag support
       this.drag = d3.drag()
         .on('start', (d: any) => {
-          if (!d3.event.active) this.force.alphaTarget(0.3).restart();
-
+          if (!d3.event.active) this.force.alphaTarget(0.3).restart();    
           d.fx = d.x;
           d.fy = d.y;
         })
@@ -123,11 +132,9 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
         })
         .on('end', (d: any) => {
           if (!d3.event.active) this.force.alphaTarget(0.3);
-
           d.fx = null;
           d.fy = null;
         });
-
 
       // define arrow markers for graph links
       this.svg.append('svg:defs').append('svg:marker')
@@ -151,7 +158,6 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
         .append('svg:path')
         .attr('d', 'M10,-5L0,0L10,5')
         .attr('fill', '#000');
-
 
       // line displayed when dragging new nodes
       this.dragLine = this.svg.append('svg:path')
@@ -210,7 +216,6 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
         const targetY = d.target.y - (this.NODE_RADIUS * normY);
         const dr = 400/(d.linknum - (d.linknum%2));  // dr determines distance from centre path. We only want to change dr every second line so we get pairs.
 
-
         let pattern="";
         if(d.linknum>1){
             const sweep = (d.linknum-1)%2; //determines which side the path arcs. 0=>left, 1=>right
@@ -221,7 +226,9 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
         return pattern;
       });
       
-      this.circle.attr('transform', (d) => `translate(${d.x},${d.y})`);
+      this.circle.attr('transform', (d) => {
+          //console.log(`transform: ${JSON.stringify(d)}`);
+          return `translate(${d.x},${d.y})`});
     }
     
     resetMouseVars() {
@@ -280,8 +287,8 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
 
       // update existing nodes (reflexive & selected visual states)
       this.circle.selectAll('circle')
-        .style('fill', (d) => this.setEntityColour(d))//(d === this.selectedNode) ? d3.rgb(this.colors(d.id)).brighter().toString() : this.colors(d.id))
-        .style('stroke', (d) => d === this.selectedNode ? 'lime' : "black")//d3.rgb(this.colors(d.id)).darker().toString())
+        .style('fill', (d) => this.setEntityColour(d))
+        .style('stroke', (d) => d === this.selectedNode ? 'lime' : "black")
         .classed('reflexive', (d) => d.reflexive);
 
       // remove old nodes
@@ -396,13 +403,15 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
 
       if (!d3.event.ctrlKey || this.mousedownNode || this.mousedownLink) return;
 
+          console.log(`Add Node - this.lastNodeId`);
       // insert new node at point
       const point = d3.mouse(d3.event.currentTarget);
-      // const point = d3.mouse(this);
+//       const point = d3.mouse(this);
       const node = { id: ++this.lastNodeId, reflexive: false, x: point[0], y: point[1] };
+      console.log(`New Node:${JSON.stringify(node)}`);
       this.nodes.push(node);
 
-      this.restart();
+     this.restart();
     }
 
     mousemove(source: any) {
@@ -459,6 +468,7 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
                 if (this.selectedNode) {
                   this.nodes.splice(this.nodes.indexOf(this.selectedNode), 1);
                   this.spliceLinksForNode(this.selectedNode);
+                  this.onDeleteEntity.emit(this.selectedNode.uuid);
                 } else if (this.selectedLink) {
                   this.links.splice(this.links.indexOf(this.selectedLink), 1);
                 }

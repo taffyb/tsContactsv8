@@ -18,7 +18,7 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
   providers: [ FieldControlService ]
 })
 export class EntityDialogComponent implements OnInit {
-    entity:IEntity;
+//    entity:IEntity;
     fields: FieldBase<any>[] = [];
     activeTab:string="Details";
     form: FormGroup= new FormGroup({});
@@ -38,16 +38,14 @@ export class EntityDialogComponent implements OnInit {
             }
             if(data.entity){
                 this.fields = this.fs.getEntityFields(data.entityDef,data.entity);
-            }else{
-                this.entity=new BaseEntity();
             }
         }
+//        console.log(`dialog open:${JSON.stringify(this.fields)}`);
         this.form =this.fcs.toFormGroup(this.fields);
         this.form.valueChanges.subscribe(form => {
             this.formChanged=true;
             this.unsavedChanges=true;
-        });  
-          
+        });            
     }
     
     ngOnInit() {

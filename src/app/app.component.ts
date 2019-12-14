@@ -1,9 +1,10 @@
 import { Component, NgZone, OnInit} from '@angular/core';
-
+import { Observable, of} from 'rxjs';
+import { delay, share } from 'rxjs/operators';
 
 import { FieldService } from './field.service';
 import { DataService } from './data.service';
-import {IEntityDef, IEntity,IRelationship} from './classes/interfaces';
+import {IEntityDef, IEntity, IEntityLite ,IRelationship} from './classes/interfaces';
 import {BaseEntity} from './classes/BaseEntity';
 import {BaseRelationship} from './classes/BaseRelationship';
 
@@ -14,6 +15,7 @@ import { RelationshipDialogComponent } from './relationship-dialog/relationship-
 import { EntityDialogComponent } from './entity-dialog/entity-dialog.component';
 import { EntityUploadDialogComponent } from './entity-upload-dialog/entity-upload-dialog.component';
 import {Data} from './data/data';
+import {DataModel} from './classes/data.model';
 
 @Component({
   selector: 'app-root',
@@ -25,10 +27,10 @@ export class AppComponent implements OnInit {
     entityType:string="Person";
     entityTypeUuid:string="";
     entityDefType:string="Person";
-    entities:{options:{},entity:IEntity}[]=[];
+    entities:{options:{},entity:IEntityLite}[]=[];
     entityDefs:IEntityDef[];
     do=DialogOptions;
-    data=Data;
+    data$:Observable<DataModel>;//=Data;
     dialogOpen:boolean=false;
 
     dialogValue:string; 
@@ -39,17 +41,25 @@ export class AppComponent implements OnInit {
     }    
     ngOnInit() {
         this.getEntities();
-        this.getEntityDefs();
+        this.getEntityDefs(); 
     }
     async getEntities() {
-        let entities:IEntity[];
+        let entities:IEntityLite[];
         this.entities=[];
         entities = await this.ds.getEntityList(true);
-        this.data.nodes=[];
+        
         entities.forEach(e=>{
             this.entities.push({options:{check:false},entity:e});
-            this.data.nodes.push({uuid:e.uuid,type:e.type,label:e.display,reflexive:false});
         });
+        this.data$ = this.getAsyncData();
+    }
+    getAsyncData(){
+        let data:DataModel={nodes:[],links:[]};
+        this.entities.forEach((e,i)=>{
+            data.nodes.push({uuid:e.entity.uuid,type:e.entity.type,label:e.entity.display,reflexive:false});
+//            console.log(`entity[${i}]: ${JSON.stringify(e)}`);
+        });
+        return of(data);
     }
     async getEntityDefs() {
         this.entityDefs = await this.ds.getEntityDefList();
@@ -105,7 +115,6 @@ export class AppComponent implements OnInit {
         dialogRef.afterClosed().subscribe(async result => {
             if(result.data!=null){
                 entity.props=[];
-//                console.log(`result.data: ${JSON.stringify(result.data)}`);
                 for(let key in result.data){
                     entity.props.push({key:key,value:result.data[key]});
                 }
@@ -163,12 +172,12 @@ export class AppComponent implements OnInit {
         this.refreshEntityDefList();
     }
     refreshEntityList(){
-//        this.entities=[];
-//        this.zone.run(async () => this.entities = await this.ds.getEntityList(true));
-        this.zone.run(async ()=> this.getEntities());
+        this.zone.run(()=> {
+            this.getEntities();
+            this.data$ = this.getAsyncData();
+        });
     }
     refreshEntityDefList(){
-//        this.entityDefs=[];
         this.zone.run(async () => this.entityDefs = await this.ds.getEntityDefList(true));
     }
     setEntityType(et){

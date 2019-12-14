@@ -7,8 +7,8 @@ export interface Node{
     id?:number,
     reflexive:boolean,
 	uuid:string,
-	type?:string,
-	label?:string,
+	type:string,
+	label:string,
 	x?:number,
 	y?:number
 }
@@ -17,7 +17,8 @@ export interface Link{
 	source:string,
 	target:string,
 	label:string,
-	value:number,
+	value?:number,
 	left:boolean,
-	right:boolean
+	right:boolean,
+	linkNum?:number
 }

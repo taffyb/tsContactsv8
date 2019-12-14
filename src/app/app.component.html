@@ -18,10 +18,14 @@
       	<entity-list [entities]="entities" (onSelect)="showEntityDialog($event)" (onDelete)="deleteEntity($event)"></entity-list>
 	</div>
   	<div class="centre">
-  		<app-canvas [data]="data" 
-  			(onSelectEntity)="showEntityDialog($event)" 
-  			(onSelectRelationship)="showRelationshipDialog($event)" 
-  			[dialogOpen]="dialogOpen"></app-canvas>
+  		<div *ngIf="data$ | async as data; else loading">
+	  		<app-canvas [data]="data" 
+	  			(onSelectEntity)="showEntityDialog($event)" 
+	  			(onDeleteEntity)="deleteEntity($event)"
+	  			(onSelectRelationship)="showRelationshipDialog($event)" 
+	  			[dialogOpen]="dialogOpen"></app-canvas>
+	  	</div>
+	  	<ng-template #loading>Loading contacts...</ng-template>
   	</div>
   	<div class="right">
   		<entity-def-list [entityDefs]="entityDefs" (onSelect)="showEntityDefDialog($event)" (onDelete)="deleteEntityDef($event)"></entity-def-list>

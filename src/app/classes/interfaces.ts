@@ -12,8 +12,14 @@ export interface IEntity{
     type:string;
     uuid:string;
     display:string;
-    icon:string;
+    icon?:string;
     props:IProp[];
+}
+export interface IEntityLite{
+    type:string;
+    uuid:string;
+    display:string;
+    icon?:string;
 }
 
 export interface IEntityDef {

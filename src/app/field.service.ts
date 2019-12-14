@@ -42,7 +42,7 @@ export class FieldService {
     let fields: FieldBase<any>[] = [];  
     let defProps={};
 
-
+    if(entity){console.log(`entityDef:${JSON.stringify(entityDef)}\nentity:${JSON.stringify(entity)}`);}
     entityDef.groups.forEach(group=>{
         group.props.forEach(prop=>{
             let order:number= Number(group.order.toString()+prop.order.toString());
