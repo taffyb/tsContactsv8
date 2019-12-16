@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, of, EMPTY, observable } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 
-import {IEntityDef, IEntity, IEntityLite, IPropertyGroup} from './classes/interfaces';
+import {IEntityDef, IEntity, IEntityLite, IPropertyGroup, IRelationship} from './classes/interfaces';
 import {DataModel} from './classes/data.model';
 
 @Injectable({
@@ -20,6 +20,7 @@ export class DataService {
     //cache 
     entityDefList:IEntityDef[];
     entityList:IEntityLite[];
+    entityLiteMap:{}={};
     entityMap:{}={};
     entityLiteMapByType:{};
     
@@ -48,7 +49,7 @@ export class DataService {
          );
         //create the two caches asynchronously so it doesn't hold anything up.
         //
-        //1. create a map of all the entities so we can easily access by uuid.
+        //1. create a map of all the entities by type so we can easily access by uuid.
         //   entityLiteMapByType{type:[{uuid:string,type:string,display:string}]}
         let y=new Promise(async (resolve,reject)=>{
             let entities = await entities$.toPromise();
@@ -60,6 +61,18 @@ export class DataService {
                     this.entityLiteMapByType[e.type]=[];
                 }
                 this.entityLiteMapByType[e.type].push(e);
+            });
+//            console.log(`getEntities transform to MapByType:${JSON.stringify(this.entityLiteMapByType)}`);
+        });
+        //1. create a map of all the entities so we can easily access by uuid.
+        //   entityLiteMapByType{type:[{uuid:string,type:string,display:string}]}
+        let x=new Promise(async (resolve,reject)=>{
+            let entities = await entities$.toPromise();
+            resolve(entities)
+        }).then((res:IEntityLite[])=>{
+            this.entityLiteMap={};
+            res.forEach(e=>{
+                this.entityLiteMap[e.uuid]=e;
             });
 //            console.log(`getEntities transform to MapByType:${JSON.stringify(this.entityLiteMapByType)}`);
         });
@@ -76,6 +89,9 @@ export class DataService {
          });
     }
 
+    getLiteEntity(uuid): IEntityLite {
+        return this.entityLiteMap[uuid];
+    }
     getEntity(uuid): Observable<IEntity> {      
         return new Observable<IEntity>((observer) => {
             if(!this.entityMap[uuid]){
@@ -139,11 +155,11 @@ export class DataService {
         });
     }   
     deleteEntityDef (euuid): Observable<any> {
-        this.entityList=null;
+//        this.entityList=null;
         return this.http
             .delete<any>(this.endpoint + 'entity-defs/' + euuid, this.httpOptions).pipe(
               tap(_ => null /*console.log(`deleted entityDef.uuid=${euuid}`)*/),
-              catchError(this.handleError<any>('deleteEntity'))
+              catchError(this.handleError<any>('deleteEntityDef'))
             );        
       }
     
@@ -187,11 +203,14 @@ export class DataService {
             }
         });
     }
-    getRelationships(uuid): Observable<IEntity> {
-        return this.http.get<IEntity>(this.endpoint + 'relationships');
+    getAllRelationships(): Observable<IRelationship[]> {
+        return this.http.get<IRelationship[]>(this.endpoint + 'relationships');
+    }
+    getRelationship(uuid,sourceUuid,targetUuid): Observable<IRelationship> {
+        return this.http.get<IRelationship>(this.endpoint + 'relationships');
     }
     getRelationshipTypes(sourceType:string,targetType:string): Observable<string[]> {
-        console.log(`data Service GET ${this.endpoint}relationships?types=${sourceType}&types=${targetType}`);
+//        console.log(`data Service GET ${this.endpoint}relationships?types=${sourceType}&types=${targetType}`);
         return this.http.get<string[]>(`${this.endpoint}relationships?types=${sourceType}&types=${targetType}`);
     }
     
@@ -203,7 +222,7 @@ export class DataService {
         return this.http
             .post(this.endpoint + 'template', files, httpOptions).pipe(
                 tap((result) => null /*console.log(`added entity`)*/),
-                catchError(this.handleError<any>('addEntity'))
+                catchError(this.handleError<any>('uploadEntityTemplate'))
         );
     }
 }

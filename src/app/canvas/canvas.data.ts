@@ -54,10 +54,11 @@ function setLinks(links:Link[]):any[]{
     }
     return _links
 }
-export const data={
+export  const canvasData={
         setData:setData,
         nodeMap:_nodeMap,
         nodeByUuid:nodeByUuid,
         nodes:_data.nodes,
-        links:_links
+        links:_links,
+        data:_data
 }

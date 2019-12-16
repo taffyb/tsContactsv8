@@ -3,11 +3,11 @@ import {
     Output, OnInit,EventEmitter,HostListener 
     } from '@angular/core';
 import * as d3 from 'd3';
-import { DataModel,Node, Link } from '../classes/data.model';
+import { DataModel,Node, Link } from '../classes/data.model'; 
 
 import { MatDialog } from '@angular/material';
 import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
-
+import {canvasData} from './canvas.data';
 
 @Component({
     selector: 'app-canvas',
@@ -20,7 +20,10 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
 
     _data: DataModel;
     @Input()set data(value: DataModel) {
+     //   canvasData.setData(value);
+     //   this._data = canvasData.data;
         this._data = value;
+//        console.log(`_data: ${JSON.stringify(this._data)}`);
         this.renderCanvas();
     }
     @Input()dialogOpen: boolean=false;
@@ -65,17 +68,22 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
 
     renderCanvas(){
         
-//      console.log(`${JSON.stringify(this.nodes)}`);
       this.nodeMap = this.nodesToMap(this._data.nodes);
       this.nodes=this._data.nodes;
+//      this.links=this._data.links;
       this._data.links.forEach(l=>{
-          this.links.push({ source: this.getNodeByUuid(l.source), 
-                            target: this.getNodeByUuid(l.target), 
-                            left: l.left, right: l.right,
-                            label:l.label, 
-                            uuid:l.uuid,
-                            linkNum:1})
+          let link = { source: this.getNodeByUuid(l.source.uuid), 
+                  target: this.getNodeByUuid(l.target.uuid), 
+                  left: l.left, right: l.right,
+                  label:l.label, 
+                  uuid:l.uuid,
+                  linkNum:1};
+          this.links.push(link);
       });
+      
+//      console.log(`links ${JSON.stringify(this.links)}`);
+      
+      
     //sort links by source, then target
       this.links=this.links.sort(function(a,b) {
           if (a.source.uuid > b.source.uuid) {return 1;}
@@ -92,7 +100,6 @@ import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
               this.links[i].source.uuid == this.links[i-1].source.uuid &&
               this.links[i].target.uuid == this.links[i-1].target.uuid) {
               this.links[i].linknum = this.links[i-1].linknum + 1;
-              console.log(`link ${JSON.stringify(this.links[i])}`);
           }else {
               this.links[i].linknum = 1;
           }

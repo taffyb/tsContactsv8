@@ -1,3 +1,5 @@
+import {IEntity, IRelationship} from './interfaces';
+
 export interface DataModel {
   nodes: Node[];
   links: Link[];
@@ -14,8 +16,8 @@ export interface Node{
 }
 export interface Link{
     uuid:string,
-	source:string,
-	target:string,
+	source:Node,
+	target:Node,
 	label:string,
 	value?:number,
 	left:boolean,

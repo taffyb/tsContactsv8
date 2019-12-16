@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
     entityTypeUuid:string="";
     entityDefType:string="Person";
     entities:{options:{},entity:IEntityLite}[]=[];
+    relationships:IRelationship[]=[];
     entityDefs:IEntityDef[];
     do=DialogOptions;
     data$:Observable<DataModel>;//=Data;
@@ -47,17 +48,30 @@ export class AppComponent implements OnInit {
         let entities:IEntityLite[];
         this.entities=[];
         entities = await this.ds.getEntityList(true);
+        this.relationships= await this.ds.getAllRelationships().toPromise();
         
         entities.forEach(e=>{
             this.entities.push({options:{check:false},entity:e});
         });
         this.data$ = this.getAsyncData();
     }
-    getAsyncData(){
+    getAsyncData():Observable<DataModel>{
         let data:DataModel={nodes:[],links:[]};
         this.entities.forEach((e,i)=>{
             data.nodes.push({uuid:e.entity.uuid,type:e.entity.type,label:e.entity.display,reflexive:false});
 //            console.log(`entity[${i}]: ${JSON.stringify(e)}`);
+        });
+        this.relationships.forEach((r)=>{
+            let source:IEntityLite=this.ds.getLiteEntity(r.source);
+            let target:IEntityLite=this.ds.getLiteEntity(r.target);
+            let link={uuid:r.uuid,
+                    source:{uuid:source.uuid,type:source.type,label:source.display,reflexive:false},
+                    target:{uuid:target.uuid,type:target.type,label:target.display,reflexive:false},
+                    label:r.label,
+                    left:r.left,
+                    right:r.right};
+            data.links.push(link);
+//            console.log(`link:${JSON.stringify(link)}`);
         });
         return of(data);
     }
@@ -70,7 +84,7 @@ export class AppComponent implements OnInit {
         const target = await this.ds.getEntity(rel.targetUuid).toPromise();
         relationship=new BaseRelationship();
         relationship.source=source;
-        relationship.target=target;  
+        relationship.target=target;   
         relationship.label=rel.label;
         if(rel.uuid){ 
             relationship.uuid=rel.uuid;

@@ -40,4 +40,6 @@ export interface IRelationship{
     source:IEntity;
     target:IEntity;
     label:string;
+    left:boolean;
+    right:boolean;
 }
