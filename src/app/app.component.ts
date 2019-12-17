@@ -189,7 +189,7 @@ export class AppComponent implements OnInit {
     refreshEntityList(){
         this.zone.run(()=> {
             this.getEntities();
-            this.data$ = this.getAsyncData();
+//            this.data$ = this.getAsyncData();
         });
     }
     refreshEntityDefList(){
