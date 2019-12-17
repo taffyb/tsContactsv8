@@ -14,9 +14,9 @@ function _getAllRelationships(): Observable<IRelationship[]> {
     console.log(`CALL _getAllRelationships`);
     return _http.get<IRelationship[]>(common.endpoint + 'relationships');
 }
-function _getRelationship(uuid,sourceUuid,targetUuid): Observable<IRelationship> {
+function _getRelationship(uuid): Observable<IRelationship> {
     console.log(`CALL _getRelationship`);
-    return _http.get<IRelationship>(common.endpoint + 'relationships');
+    return _http.get<IRelationship>(`${common.endpoint}relationships/${uuid}`);
 }
 function _getRelationshipTypes(sourceType:string,targetType:string): Observable<string[]> {
     console.log(`CALL _getRelationshipTypes`);

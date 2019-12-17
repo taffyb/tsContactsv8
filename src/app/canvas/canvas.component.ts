@@ -77,11 +77,10 @@ import {canvasData} from './canvas.data';
                   left: l.left, right: l.right,
                   label:l.label, 
                   uuid:l.uuid,
-                  linkNum:1};
+                  linknum:1};
           this.links.push(link);
       });
       
-//      console.log(`links ${JSON.stringify(this.links)}`);
       
       
     //sort links by source, then target
@@ -94,16 +93,23 @@ import {canvasData} from './canvas.data';
               else {return 0;}
           }
       });
-      //any links with duplicate source and target get an incremented 'linknum'
-      for (var i=0; i<this.links.length; i++) {
-          if (i != 0 &&
-              this.links[i].source.uuid == this.links[i-1].source.uuid &&
-              this.links[i].target.uuid == this.links[i-1].target.uuid) {
-              this.links[i].linknum = this.links[i-1].linknum + 1;
-          }else {
-              this.links[i].linknum = 1;
+      //any links with duplicate source and target (in any direction) get an incremented 'linknum'
+      let linkpairs={};
+      this.links.forEach((l)=>{
+          let fwdId = l.source.uuid+l.target.uuid;
+          let bakId = l.target.uuid+l.source.uuid;
+          if(!(linkpairs[fwdId] || linkpairs[bakId])){
+              linkpairs[fwdId]=1;
+              l.linknum=1;
+          }else if(linkpairs[fwdId]){
+              linkpairs[fwdId]+=1;
+              l.linknum=linkpairs[fwdId];
+          }else{
+              linkpairs[bakId]+=1;
+              l.linknum=linkpairs[bakId];
           }
-      }
+      });
+//    console.log(`links ${JSON.stringify(this.links)}`);
       const rect = this.canvas.nativeElement.getBoundingClientRect();
       
       d3.select('svg').remove();
@@ -217,11 +223,12 @@ import {canvasData} from './canvas.data';
         const lenZ = Math.sqrt(lenX * lenX + lenY * lenY);        //calculate the length of Z (Z=sqrt(X^2 + Y^2)
         const normX = lenX / lenZ;                                 
         const normY = lenY / lenZ;
-        const sourceX = d.source.x + (this.NODE_RADIUS * normX);     //calculate start(source) & end(target) of path
+        const sourceX = d.source.x + (this.NODE_RADIUS * normX);  //calculate start(source) & end(target) of path
         const sourceY = d.source.y + (this.NODE_RADIUS * normY);
         const targetX = d.target.x - (this.NODE_RADIUS * normX);
         const targetY = d.target.y - (this.NODE_RADIUS * normY);
-        const dr = 400/(d.linknum - (d.linknum%2));  // dr determines distance from centre path. We only want to change dr every second line so we get pairs.
+        const dr = 400/(d.linknum - (d.linknum%2));               // dr determines distance from centre path. 
+                                                                  // We only want to change dr every second line so we get pairs.
 
         let pattern="";
         if(d.linknum>1){

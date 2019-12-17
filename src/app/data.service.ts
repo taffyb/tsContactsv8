@@ -41,7 +41,7 @@ export class DataService {
 
     //Relationship Data Service Functions
     getAllRelationships(){return relSvc.getAllRelationships();}
-    getRelationship(uuid:string,sourceUuid:string,targetUuid:string){return relSvc.getRelationship(uuid,sourceUuid,targetUuid);}
+    getRelationship(uuid:string){return relSvc.getRelationship(uuid);}
     getRelationshipTypes(sourceType:string,targetType:string){return relSvc.getRelationshipTypes(sourceType,targetType);}
  
 }

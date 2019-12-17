@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
     entityTypeUuid:string="";
     entityDefType:string="Person";
     entities:{options:{},entity:IEntityLite}[]=[];
-    relationships:IRelationship[]=[];
+    relationships:[]=[];
     entityDefs:IEntityDef[];
     do=DialogOptions;
     data$:Observable<DataModel>;//=Data;
