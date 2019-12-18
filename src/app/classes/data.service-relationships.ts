@@ -35,10 +35,20 @@ function _addRelationship (relationship:IRelationship): Observable<IRelationship
 
     return result$;
 }
+
+function _updateRelationship (relationship:IRelationship): Observable<any> {
+    console.log(`CALL _updateRelationship`);
+    return _http
+        .put(common.endpoint + 'relationships/' + relationship.uuid, JSON.stringify(relationship), common.httpOptions).pipe(
+            tap((result) => {null;console.log(`updated relationship  id=${relationship.uuid}`)}),
+            catchError(common.handleError<any>('updateRelationship'))
+          );
+}
 // Exports
 export const setHttpClient=(http)=>{_http=http;console.log(`set RelSvc.HttpClient`);}
 export const getAllRelationships=_getAllRelationships;
 export const getRelationship=_getRelationship;
 export const getRelationshipTypes=_getRelationshipTypes;
 export const addRelationship=_addRelationship;
+export const updateRelationship=_updateRelationship;
 

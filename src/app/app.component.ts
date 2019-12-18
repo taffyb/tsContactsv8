@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
     relationships:IRelationship[]=[];
     entityDefs:IEntityDef[];
     do=DialogOptions;
-    data$:Observable<DataModel>;//=Data;
+    data$:Observable<DataModel>;
     dialogOpen:boolean=false;
 
     dialogValue:string; 
@@ -59,7 +59,6 @@ export class AppComponent implements OnInit {
         let data:DataModel={nodes:[],links:[]};
         this.entities.forEach((e,i)=>{
             data.nodes.push({uuid:e.entity.uuid,type:e.entity.type,label:e.entity.display,reflexive:false});
-//            console.log(`entity[${i}]: ${JSON.stringify(e)}`);
         });
         this.relationships.forEach((r)=>{
             let source:IEntityLite=this.ds.getLiteEntity(r.source);
@@ -71,7 +70,6 @@ export class AppComponent implements OnInit {
                     left:r.left,
                     right:r.right};
             data.links.push(link);
-//            console.log(`link:${JSON.stringify(link)}`);
         });
         return of(data);
     }
@@ -103,16 +101,14 @@ export class AppComponent implements OnInit {
             if(result.data!=null){
                 let relationship:IRelationship=result.data;
                 if(relationship.uuid){
-//                   await this.ds.updateRelationship(relationship).toPromise();
+                   await this.ds.updateRelationship(relationship).toPromise();
                 }else{
                    await this.ds.addRelationship(relationship).toPromise();
                 } 
                 this.refreshEntityList();
                 this.zone.run(() =>this.dialogOpen=false);          
             }
-        });
-
-               
+        });               
     }
     async showEntityDialog(uuid:string){
         this.dialogOpen=true;
@@ -198,7 +194,6 @@ export class AppComponent implements OnInit {
     refreshEntityList(){
         this.zone.run(()=> {
             this.getEntities();
-//            this.data$ = this.getAsyncData();
         });
     }
     refreshEntityDefList(){
@@ -226,7 +221,6 @@ export class AppComponent implements OnInit {
       }
     async openEntityTemplate(entityType:string){
         const e= await this.ds.getEntityDef(entityType);
-
         window.location.href = `http://localhost:4001/api/template/${e.uuid}`;
     }
 }

@@ -41,6 +41,7 @@ export class DataService {
 
     //Relationship Data Service Functions
     addRelationship(rel:IRelationship){return relSvc.addRelationship(rel);}
+    updateRelationship(rel:IRelationship){return relSvc.updateRelationship(rel);}
     getAllRelationships(){return relSvc.getAllRelationships();}
     getRelationship(uuid:string){return relSvc.getRelationship(uuid);}
     getRelationshipTypes(sourceType:string,targetType:string){return relSvc.getRelationshipTypes(sourceType,targetType);}

@@ -20,11 +20,10 @@ import * as canvasData from './canvas.data';
 
     _data: DataModel;
     @Input()set data(value: DataModel) {
-     //   canvasData.setData(value);
-     //   this._data = canvasData.data;
-        this._data = value;
-//        console.log(`_data: ${JSON.stringify(this._data)}`);
-        this.renderCanvas();
+        canvasData.setData(value).then(()=>{
+            console.log(`set data: canvasData.nodes: ${JSON.stringify(canvasData.nodes)}`);
+            this._data = value;
+           this.renderCanvas();});        
     }
     @Input()dialogOpen: boolean=false;
     @Output()onSelectEntity:EventEmitter<string> = new EventEmitter<string>();
@@ -67,7 +66,8 @@ import * as canvasData from './canvas.data';
     }
 
     renderCanvas(){
-        
+
+      console.log(`renderCanvas: canvasData.data: ${JSON.stringify(canvasData.data)}`);
       this.nodeMap = this.nodesToMap(this._data.nodes);
       this.nodes=this._data.nodes;
 //      this.links=this._data.links;
@@ -99,14 +99,16 @@ import * as canvasData from './canvas.data';
           let fwdId = l.source.uuid+l.target.uuid;
           let bakId = l.target.uuid+l.source.uuid;
           if(!(this.linkpairs[fwdId] || this.linkpairs[bakId])){
-              this.linkpairs[fwdId]=1;
+              this.linkpairs[fwdId]=[l];
               l.linknum=1;
           }else if(this.linkpairs[fwdId]){
-              this.linkpairs[fwdId]+=1;
-              l.linknum=this.linkpairs[fwdId];
+              this.linkpairs[fwdId][0].linknum=2;
+              this.linkpairs[fwdId].push(l);
+              l.linknum=this.linkpairs[fwdId].length+1;
           }else{
-              this.linkpairs[bakId]+=1;
-              l.linknum=this.linkpairs[bakId];
+              this.linkpairs[bakId][0].linknum=2;
+              this.linkpairs[bakId].push(l);
+              l.linknum=this.linkpairs[bakId].length+1;
           }
       });
 //    console.log(`links ${JSON.stringify(this.links)}`);
@@ -383,18 +385,20 @@ import * as canvasData from './canvas.data';
               let l = { source, target, left: !isRight, right: isRight,label:"",linknum:1 };
               let fwdId=source.uuid+target.uuid;
               let bakId=target.uuid+source.uuid;
-              
+
               if(!(this.linkpairs[fwdId] || this.linkpairs[bakId])){
-                  this.linkpairs[fwdId]=1;
+                  this.linkpairs[fwdId]=[l];
                   l.linknum=1;
               }else if(this.linkpairs[fwdId]){
-                  this.linkpairs[fwdId]+=1;
-                  l.linknum=this.linkpairs[fwdId];
+                  this.linkpairs[fwdId][0].linknum=2;
+                  this.linkpairs[fwdId].push(l);
+                  l.linknum=this.linkpairs[fwdId].length+1;
               }else{
-                  this.linkpairs[bakId]+=1;
-                  l.linknum=this.linkpairs[bakId];
+                  this.linkpairs[bakId][0].linknum=2;
+                  this.linkpairs[bakId].push(l);
+                  l.linknum=this.linkpairs[bakId].length+1;
               }
-            this.links.push(l);
+              this.links.push(l);
           }
 
           // select new link
