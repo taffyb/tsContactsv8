@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
     entityTypeUuid:string="";
     entityDefType:string="Person";
     entities:{options:{},entity:IEntityLite}[]=[];
-    relationships:[]=[];
+    relationships:IRelationship[]=[];
     entityDefs:IEntityDef[];
     do=DialogOptions;
     data$:Observable<DataModel>;//=Data;
@@ -78,13 +78,13 @@ export class AppComponent implements OnInit {
     async getEntityDefs() {
         this.entityDefs = await this.ds.getEntityDefList();
     }
-    async showRelationshipDialog(rel:any){
-        let relationship:IRelationship;
-        const source = await this.ds.getEntity(rel.sourceUuid).toPromise();
-        const target = await this.ds.getEntity(rel.targetUuid).toPromise();
+    async showRelationshipDialog(rel:IRelationship){
+        let relationship:IRelationship; 
+        const source = await this.ds.getEntity(rel.source).toPromise();
+        const target = await this.ds.getEntity(rel.target).toPromise();
         relationship=new BaseRelationship();
-        relationship.source=source;
-        relationship.target=target;   
+        relationship.source=rel.source;
+        relationship.target=rel.target;   
         relationship.label=rel.label;
         if(rel.uuid){ 
             relationship.uuid=rel.uuid;
@@ -95,15 +95,24 @@ export class AppComponent implements OnInit {
         const dialogRef = this.dialog.open(RelationshipDialogComponent, {
             backdropClass:'custom-dialog-backdrop-class',
             panelClass:'custom-dialog-panel-class',
-            data: {relationship:relationship,labels:labels}
+            data: {relationship:relationship,source:source,target:target,labels:labels}
           });
         dialogRef.disableClose=true;
         dialogRef.afterClosed().subscribe(async result => {
+            console.log(`Relationship: ${JSON.stringify(result.data)}`);
             if(result.data!=null){
-                console.log(`showRelationshipDialog.close ${JSON.stringify(result.data)}`);
+                let relationship:IRelationship=result.data;
+                if(relationship.uuid){
+//                   await this.ds.updateRelationship(relationship).toPromise();
+                }else{
+                   await this.ds.addRelationship(relationship).toPromise();
+                } 
+                this.refreshEntityList();
                 this.zone.run(() =>this.dialogOpen=false);          
             }
         });
+
+               
     }
     async showEntityDialog(uuid:string){
         this.dialogOpen=true;

@@ -8,12 +8,12 @@
   <p>
   <div class="form-row">
   	<div class="label" >From Entity:</div>
-  	<div class="value">{{relationship.source.display}}</div>
+  	<div class="value">{{source.display}}</div>
   </div>
   <div class="form-row">
   	<div class="label" >Rel:</div>
   	<div class="value">
-	  	<input name="rellabel" type="text" list="labels" [(ngModel)]="relationship.label"/>
+	  	<input name="rellabel" type="text" list="labels" [(ngModel)]="relationship.label" (change)="onChanged()"/>
 		<datalist  id="labels"  >
 		    <option *ngFor="let l of labels" [value]="l">{{l}}</option>
 		</datalist>
@@ -21,11 +21,11 @@
   </div>   
   <div class="form-row">
   	<div class="label" >To Entity:</div>
-  	<div class="value">{{relationship.target.display}}</div>
+  	<div class="value">{{target.display}}</div>
   </div>
   <p>
   <div class="form-row">
-      <button mat-raised-button (click)="onSave()" >Save</button> &nbsp;
+      <button mat-raised-button (click)="onSave()" [disabled]="!unsavedChanges">Save</button> &nbsp;
       <button mat-raised-button (click)="closeDialog()">Cancel</button>
   </div>
 </form>

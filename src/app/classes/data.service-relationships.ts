@@ -22,9 +22,23 @@ function _getRelationshipTypes(sourceType:string,targetType:string): Observable<
     console.log(`CALL _getRelationshipTypes`);
     return _http.get<string[]>(`${common.endpoint}relationships?types=${sourceType}&types=${targetType}`);
 }
+
+function _addRelationship (relationship:IRelationship): Observable<IRelationship> {
+    console.log(`CALL _addRelationship`);
+    const result$=_http
+    .post(common.endpoint + 'relationships', JSON.stringify(relationship), common.httpOptions).pipe(
+        tap((result:any) => {                    
+            console.log(`added relationship:${JSON.stringify(result)}`);
+        }),
+        catchError(common.handleError<any>('addRelationship'))
+      );
+
+    return result$;
+}
 // Exports
 export const setHttpClient=(http)=>{_http=http;console.log(`set RelSvc.HttpClient`);}
 export const getAllRelationships=_getAllRelationships;
 export const getRelationship=_getRelationship;
 export const getRelationshipTypes=_getRelationshipTypes;
+export const addRelationship=_addRelationship;
 

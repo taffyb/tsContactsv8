@@ -37,8 +37,8 @@ export interface IProperty{
 }
 export interface IRelationship{
     uuid:string;
-    source:IEntity;
-    target:IEntity;
+    source:string;
+    target:string;
     label:string;
     left:boolean;
     right:boolean;

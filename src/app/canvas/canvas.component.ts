@@ -7,7 +7,7 @@ import { DataModel,Node, Link } from '../classes/data.model';
 
 import { MatDialog } from '@angular/material';
 import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
-import {canvasData} from './canvas.data';
+import * as canvasData from './canvas.data';
 
 @Component({
     selector: 'app-canvas',
@@ -58,7 +58,7 @@ import {canvasData} from './canvas.data';
     nodes=[];
     nodeMap={};
     links=[];
-
+    linkpairs={};
     showTick=true;
     
     constructor(public dialog: MatDialog){
@@ -94,19 +94,19 @@ import {canvasData} from './canvas.data';
           }
       });
       //any links with duplicate source and target (in any direction) get an incremented 'linknum'
-      let linkpairs={};
+      
       this.links.forEach((l)=>{
           let fwdId = l.source.uuid+l.target.uuid;
           let bakId = l.target.uuid+l.source.uuid;
-          if(!(linkpairs[fwdId] || linkpairs[bakId])){
-              linkpairs[fwdId]=1;
+          if(!(this.linkpairs[fwdId] || this.linkpairs[bakId])){
+              this.linkpairs[fwdId]=1;
               l.linknum=1;
-          }else if(linkpairs[fwdId]){
-              linkpairs[fwdId]+=1;
-              l.linknum=linkpairs[fwdId];
+          }else if(this.linkpairs[fwdId]){
+              this.linkpairs[fwdId]+=1;
+              l.linknum=this.linkpairs[fwdId];
           }else{
-              linkpairs[bakId]+=1;
-              l.linknum=linkpairs[bakId];
+              this.linkpairs[bakId]+=1;
+              l.linknum=this.linkpairs[bakId];
           }
       });
 //    console.log(`links ${JSON.stringify(this.links)}`);
@@ -218,6 +218,7 @@ import {canvasData} from './canvas.data';
           *  | /
           *  |/
           */
+        if(!d.target.x){console.log(`d:${JSON.stringify(d)}`)}
         const lenX = d.target.x - d.source.x;                     //calculate the difference between the target and source X positions
         const lenY = d.target.y - d.source.y;                     //calculate the difference between the target and source Y positions
         const lenZ = Math.sqrt(lenX * lenX + lenY * lenY);        //calculate the length of Z (Z=sqrt(X^2 + Y^2)
@@ -269,17 +270,19 @@ import {canvasData} from './canvas.data';
 
       // add new links
       this.path = this.path.enter().append('svg:path')
-        .attr('class', 'link')
+        .attr('class', (d)=>d.uuid?'link':'link new')
         .classed('selected', (d) => this.selectedLink?d.uuid === this.selectedLink.uuid:false)
         .style('marker-start', (d) => d.left ? 'url(#start-arrow)' : '')
         .style('marker-end', (d) => d.right ? 'url(#end-arrow)' : '')
         .on('dblclick', (d)=>{
             this.dialogOpen=true;
-            if(d.left){
-                this.onSelectRelationship.emit({uuid:d.uuid,sourceUuid:d.target.uuid,targetUuid:d.source.uuid,label:d.label});
+            console.log(`dblclick on ${JSON.stringify(d)}`);
+            if(d.uuid){
+                this.onSelectRelationship.emit({uuid:d.uuid,target:d.target.uuid,source:d.source.uuid,label:d.label,left:d.left,right:d.right});
             }else{
-                this.onSelectRelationship.emit({uuid:d.uuid,sourceUuid:d.source.uuid,targetUuid:d.target.uuid,label:d.label});
+                this.onSelectRelationship.emit({uuid:"",source:d.target.uuid,target:d.source.uuid,label:d.label,left:d.left,right:d.right});
             }
+            
             this.resetMouseVars();
             this.restart();
         })
@@ -376,7 +379,22 @@ import {canvasData} from './canvas.data';
           if (link) {
             link[isRight ? 'right' : 'left'] = true;
           } else {
-            this.links.push({ source, target, left: !isRight, right: isRight,label:"" });
+//        ADD NEW LINK
+              let l = { source, target, left: !isRight, right: isRight,label:"",linknum:1 };
+              let fwdId=source.uuid+target.uuid;
+              let bakId=target.uuid+source.uuid;
+              
+              if(!(this.linkpairs[fwdId] || this.linkpairs[bakId])){
+                  this.linkpairs[fwdId]=1;
+                  l.linknum=1;
+              }else if(this.linkpairs[fwdId]){
+                  this.linkpairs[fwdId]+=1;
+                  l.linknum=this.linkpairs[fwdId];
+              }else{
+                  this.linkpairs[bakId]+=1;
+                  l.linknum=this.linkpairs[bakId];
+              }
+            this.links.push(l);
           }
 
           // select new link
@@ -387,6 +405,7 @@ import {canvasData} from './canvas.data';
 
       // Append images
       g.append("svg:image")
+        .attr("class",(d)=>d.uuid?'':'hidden')
         .attr("pointer-events","none")
         .attr("xlink:href",  (d) =>{ return '/assets/'+d.type+'.svg';})
         .attr("x", (d) =>{ return -9;})

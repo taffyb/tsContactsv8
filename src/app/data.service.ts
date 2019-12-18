@@ -40,6 +40,7 @@ export class DataService {
     getEntityDef(type:string){return entityDefSvc.getEntityDef(type);}
 
     //Relationship Data Service Functions
+    addRelationship(rel:IRelationship){return relSvc.addRelationship(rel);}
     getAllRelationships(){return relSvc.getAllRelationships();}
     getRelationship(uuid:string){return relSvc.getRelationship(uuid);}
     getRelationshipTypes(sourceType:string,targetType:string){return relSvc.getRelationshipTypes(sourceType,targetType);}

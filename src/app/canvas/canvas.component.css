@@ -8,6 +8,9 @@
     user-select: none;
   }
   
+  ::ng-deep image.hidden {
+    visibility : hidden;
+  }
   ::ng-deep svg:not(.active):not(.ctrl) {
     cursor: crosshair;
   }
@@ -25,6 +28,9 @@
   
   ::ng-deep path.link.selected {
     stroke-dasharray: 10,2;
+  }
+  ::ng-deep path.link.new {
+    stroke: lime;
   }
   
   ::ng-deep path.link.dragline {
