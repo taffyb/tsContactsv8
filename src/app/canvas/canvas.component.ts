@@ -60,6 +60,8 @@ import * as canvasData from './canvas.data';
     linkpairs={};
     showTick=true;
     
+    debug_count=1;
+    
     constructor(public dialog: MatDialog){
     }
     ngOnInit(){
@@ -80,19 +82,17 @@ import * as canvasData from './canvas.data';
                   linknum:1};
           this.links.push(link);
       });
-      
-      
-      
-    //sort links by source, then target
-      this.links=this.links.sort(function(a,b) {
-          if (a.source.uuid > b.source.uuid) {return 1;}
-          else if (a.source.uuid < b.source.uuid) {return -1;}
-          else {
-              if (a.target.uuid > b.target.uuid) {return 1;}
-              if (a.target.uuid < b.target.uuid) {return -1;}
-              else {return 0;}
-          }
-      });
+  
+//    //sort links by source, then target
+//      this.links=this.links.sort(function(a,b) {
+//          if (a.source.uuid > b.source.uuid) {return 1;}
+//          else if (a.source.uuid < b.source.uuid) {return -1;}
+//          else {
+//              if (a.target.uuid > b.target.uuid) {return 1;}
+//              if (a.target.uuid < b.target.uuid) {return -1;}
+//              else {return 0;}
+//          }
+//      });
       //any links with duplicate source and target (in any direction) get an incremented 'linknum'
       
       this.links.forEach((l)=>{
@@ -100,14 +100,17 @@ import * as canvasData from './canvas.data';
           let bakId = l.target.uuid+l.source.uuid;
           if(!(this.linkpairs[fwdId] || this.linkpairs[bakId])){
               this.linkpairs[fwdId]=[l];
+              l.dir="fwd";
               l.linknum=1;
           }else if(this.linkpairs[fwdId]){
               this.linkpairs[fwdId][0].linknum=2;
               this.linkpairs[fwdId].push(l);
               l.linknum=this.linkpairs[fwdId].length+1;
+              l.dir="fwd";
           }else{
               this.linkpairs[bakId][0].linknum=2;
               this.linkpairs[bakId].push(l);
+              l.dir="bak";
               l.linknum=this.linkpairs[bakId].length+1;
           }
       });
@@ -235,11 +238,24 @@ import * as canvasData from './canvas.data';
 
         let pattern="";
         if(d.linknum>1){
-            const sweep = (d.linknum-1)%2; //determines which side the path arcs. 0=>left, 1=>right
+            let sweep = (d.linknum-1)%2; //determines which side the path arcs. 0=>left, 1=>right
+            if(d.dir=="bak"){
+                sweep=sweep==1?0:1;
+            }
             pattern= `M ${sourceX},${sourceY} A ${dr} ${dr} 0 0 ${sweep} ${targetX} ${targetY}`;
         }else{
             pattern= `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`;
         }
+        
+//        if((d.source.label==="Andy, Sime" || d.source.label==="Oxido") && 
+//           (d.target.label==="Andy, Sime" || d.target.label==="Oxido") &&
+//            this.debug_count<=2){
+////        if((d.source.label==="Taffy, Brecknock" || d.source.label==="Suzannah, Brecknock") && 
+////              (d.target.label==="Taffy, Brecknock" || d.target.label==="Suzannah, Brecknock") &&
+////               this.debug_count<=2){
+//            console.log(`tick: ${JSON.stringify(d)}\n${pattern}`);
+//                this.debug_count++;
+//        }
         return pattern;
       });
       
